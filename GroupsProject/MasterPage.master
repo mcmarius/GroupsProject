@@ -1,0 +1,34 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <title></title>
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <h1>Groups!</h1>
+            <asp:HyperLink ID="HyperLink1" NavigateUrl="~/Index.aspx" runat="server">Home</asp:HyperLink>
+            
+            <asp:HyperLink ID="HyperLink2" NavigateUrl="~/Search.aspx" runat="server">Search</asp:HyperLink>
+            
+            <asp:LoginView ID="LoginView1" runat="server">
+                <AnonymousTemplate>
+                    <asp:HyperLink ID="HyperLink3" NavigateUrl="~/Signup.aspx" runat="server">Sign up</asp:HyperLink>
+                    <asp:HyperLink ID="HyperLink4" NavigateUrl="~/Signin.aspx" runat="server">Sign in</asp:HyperLink>
+                </AnonymousTemplate>
+            </asp:LoginView>
+        </div>
+        
+        <div>
+            <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+
+            </asp:ContentPlaceHolder>
+        </div>
+</form>
+</body>
+</html>

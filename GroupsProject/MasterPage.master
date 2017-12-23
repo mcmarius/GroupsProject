@@ -1,5 +1,5 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
-
+<%-- todo AddUserToRoles vector de roluri (strings) pt mai multe roluri --%>
 <!DOCTYPE html>
 
 <html>
@@ -12,6 +12,8 @@
     <form id="form1" runat="server">
         <div>
             <h1>Groups!</h1>
+            
+            
             <asp:HyperLink ID="HyperLink1" NavigateUrl="~/Index.aspx" runat="server">Home</asp:HyperLink>
             
             <asp:HyperLink ID="HyperLink2" NavigateUrl="~/Search.aspx" runat="server">Search</asp:HyperLink>
@@ -19,8 +21,37 @@
             <asp:LoginView ID="LoginView1" runat="server">
                 <AnonymousTemplate>
                     <asp:HyperLink ID="HyperLink3" NavigateUrl="~/Signup.aspx" runat="server">Sign up</asp:HyperLink>
-                    <asp:HyperLink ID="HyperLink4" NavigateUrl="~/Signin.aspx" runat="server">Sign in</asp:HyperLink>
+                    <%--<asp:HyperLink ID="HyperLink4" NavigateUrl="~/Signin.aspx" runat="server">Sign in</asp:HyperLink>--%>
                 </AnonymousTemplate>
+            </asp:LoginView>
+        </div>
+        
+        <div style="float: right">
+            <asp:LoginView ID="LoginView2" runat="server">
+                <AnonymousTemplate>
+                    <asp:Login ID="Login1" runat="server">
+                        <LayoutTemplate>
+                            <asp:Label ID="UserLabel" runat="server" Text="User: "></asp:Label>
+                            <asp:TextBox ID="UserName" runat="server"></asp:TextBox>
+                            <!-- todo add validations -->
+                            
+                            
+                            <asp:Label ID="PasswordLabel" runat="server" Text="Password: "></asp:Label>
+                            <asp:TextBox ID="Password" runat="server" TextMode="Password"></asp:TextBox>
+                            <!-- todo add validations -->
+                            
+                            <asp:Button ID="SigninButton" runat="server" CommandName="Login" Text="Sign in" />
+                        </LayoutTemplate>
+                    </asp:Login>
+                </AnonymousTemplate>
+                <LoggedInTemplate>
+                    Hi, <asp:LoginName ID="LoginName1" runat="server" />
+                    <asp:LoginStatus ID="LoginStatus1" runat="server" />
+                </LoggedInTemplate>
+                <RoleGroups>
+                    <asp:RoleGroup runat="server" Roles="User"></asp:RoleGroup>
+                </RoleGroups>
+
             </asp:LoginView>
         </div>
         
@@ -32,3 +63,4 @@
 </form>
 </body>
 </html>
+

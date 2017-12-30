@@ -23,6 +23,11 @@
                     <asp:HyperLink ID="HyperLink3" NavigateUrl="~/Signup.aspx" runat="server">Sign up</asp:HyperLink>
                     <%--<asp:HyperLink ID="HyperLink4" NavigateUrl="~/Signin.aspx" runat="server">Sign in</asp:HyperLink>--%>
                 </AnonymousTemplate>
+                <LoggedInTemplate>
+                    <asp:HyperLink runat="server" NavigateUrl="UserPages/MyGroups.aspx">My groups</asp:HyperLink>
+                    <asp:HyperLink runat="server" NavigateUrl="UserPages/CreateGroup.aspx">Create group</asp:HyperLink>
+                    <asp:HyperLink runat="server" NavigateUrl="UserPages/Warnings.aspx">Warnings</asp:HyperLink>
+                </LoggedInTemplate>
             </asp:LoginView>
         </div>
         

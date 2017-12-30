@@ -1,7 +1,7 @@
-9dbb7c1f-4f07-4ed6-a38b-1b8235f46882 app id
-67e1b1c7-619b-4577-bd51-aacb4a99ef83 admin role id
-d1669067-d2a7-4d92-8528-9848ac3e446a mod role id
-7a558698-bce3-4c6f-b13c-adf66b56c1bd user role id
+9dbb7c1f-4f07-4ed6-a38b-1b8235f46882 app id nuuu
+67e1b1c7-619b-4577-bd51-aacb4a99ef83 admin role id &
+d1669067-d2a7-4d92-8528-9848ac3e446a mod role id &
+7a558698-bce3-4c6f-b13c-adf66b56c1bd user role id &
 744299e1-cb51-45cd-b54e-4ba038749613 root userid
 8588c824-32f2-4772-97e0-702cf0b00227
 b4c4ad76-c0d1-40b2-9e25-8ac875ee58fd

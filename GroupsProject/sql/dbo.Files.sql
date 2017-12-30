@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[Files]
+(
+	[FileId] INT NOT NULL PRIMARY KEY IDENTITY (1,1), 
+    [FileName] NVARCHAR(50) NOT NULL, 
+    [FileContent] VARBINARY(MAX) NOT NULL, 
+    [PostId] INT NOT NULL, 
+    CONSTRAINT [FK_Files_ToPosts] FOREIGN KEY ([PostId]) REFERENCES [Posts]([PostId]) ON DELETE CASCADE
+)

@@ -12,6 +12,6 @@
     
     <asp:GridView runat="server" DataSourceID="SqlDataSource"></asp:GridView>
 
-    <asp:SqlDataSource ID="SqlDataSource" runat="server" ConnectionString="<%$ConnectionStrings:ConnectionString%>" SelectCommand="SELECT CategoryName FROM Categories"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="SqlDataSource" runat="server" ConnectionString="<%$ConnectionStrings:ConnectionString%>" SelectCommand="SELECT CategoryName as 'Category Name' FROM Categories"></asp:SqlDataSource>
 </asp:Content>
 

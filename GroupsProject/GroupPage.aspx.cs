@@ -10,10 +10,21 @@ public partial class GroupPage : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        try
+        {
+            int.Parse(Request.Params["gid"]);
+        }
+        catch (Exception exception)
+        {
+            Response.Redirect("~/UserPages/MyGroups.aspx");
+            Console.WriteLine(exception.Message);
+        }
         if (Request.Params["gid"] != null)
         {
             string gid = Server.UrlDecode(Request.Params["gid"]);
             int catId = 0;
+            bool isMod = false;
+            bool isMem = false;
             
             try
             {
@@ -46,11 +57,30 @@ public partial class GroupPage : System.Web.UI.Page
                     {
                         CategoryLiteral.Text = reader["CategoryName"].ToString();
                     }
-
+                    reader.Close();
+                    
                     // acum vedem daca userul este membru al grupului
-                    string glist = "SELECT [UserName], [GroupId], [IsModerator], [IsMember] FROM GroupLists WHERE UserName=@uname";
+                    string glist = "SELECT [IsModerator], [IsMember] FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
+                    SqlCommand cmd3 = new SqlCommand(glist, con);
+                    cmd3.Parameters.AddWithValue("uname", User.Identity.Name);
+                    cmd3.Parameters.AddWithValue("gid", gid);
+                    reader = cmd3.ExecuteReader();
                     
-                    
+                    while (reader.Read())
+                    {
+                        //var modCB = LV.FindControl("ModCB") as CheckBox;
+                        //var memberCB = LV.FindControl("MemberCB") as CheckBox;
+                        //modCB.Checked = 
+                            isMod = bool.Parse(reader["IsModerator"].ToString());
+                        //memberCB.Checked = 
+                            isMem = bool.Parse(reader["IsMember"].ToString());
+                    }
+
+                    if (isMem){ hidIsMem.Value = "true"; }
+                    else { hidIsMem.Value = "false"; }
+                    if (isMod) { hidIsMod.Value = "true"; }
+                    else { hidIsMod.Value = "false"; }
+
                     
                     // apoi afisam postarile, fisierele, activitatile
                 }
@@ -69,6 +99,44 @@ public partial class GroupPage : System.Web.UI.Page
             {
                 StatusMsg.Text += "\n" + ex.Message;
             }
+        }
+    }
+
+    protected void LeaveButton_OnClick(object sender, EventArgs e)
+    {
+        
+    }
+
+    protected void JoinButton_OnClick(object sender, EventArgs e)
+    {
+        
+    }
+
+    protected void DelButton_OnClick(object sender, EventArgs e)
+    {
+        try
+        {
+            string gid = Request.Params["gid"];
+            SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            con.Open();
+            
+            try
+            {
+                string query = "DELETE FROM [Groups] WHERE GroupId = @gid";
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("gid", gid);
+                cmd.ExecuteNonQuery();
+                StatusMsg.Text = "You have deleted this group!";
+                Response.Redirect("~/UserPages/MyGroups.aspx");
+            }
+            catch (Exception ex)
+            {
+                StatusMsg.Text += "\n" + ex.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMsg.Text += "\n" + ex.Message;
         }
     }
 }

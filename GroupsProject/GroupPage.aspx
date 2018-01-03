@@ -22,6 +22,10 @@
     <asp:Literal runat="server" ID="CategoryLiteral"></asp:Literal>
     <br/>
     
+    <asp:HiddenField runat="server" ID="hidIsMem" Value="false"/>
+    <asp:HiddenField runat="server" ID="hidIsMod" Value="false"/>
+    
+    
     <asp:LoginView runat="server" ID="LV">
         <AnonymousTemplate>
             
@@ -32,7 +36,16 @@
                 activities
                 files --%>
             
-            
+            <% if (bool.Parse(hidIsMem.Value))
+               { %>
+                <asp:Button runat="server" ID="LeaveButton" Text="Leave group" OnClick="LeaveButton_OnClick"/>
+            <% }
+               else
+               { %>
+                <asp:Button runat="server" ID="JoinButton" Text="Join group" OnClick="JoinButton_OnClick"/>
+            <% } %>
+            <%--<asp:CheckBox runat="server" ID="MemberCB" Enabled="False"/>
+            <asp:CheckBox runat="server" ID="ModCB" Enabled="False"/>--%>
             
             <%-- navigation: join if pending or oth
                 /leave if member
@@ -40,19 +53,24 @@
                 
                 if isModerator ... dar asta la pagina cu membri--%>
             
-            <% %>
             
         </LoggedInTemplate>
+    </asp:LoginView>
+    <asp:LoginView runat="server" ID="LV2">
         <RoleGroups>
             <asp:RoleGroup runat="server" Roles="Admin">
                 <ContentTemplate>
-                    <asp:HyperLink runat="server" ID="DelGroup"
-                                    NavigateUrl='<%# "~/AdminPages/Confirm.aspx?gid=" +
-                                                     Server.UrlEncode(Request.Params["gid"])
-                                                 %>'></asp:HyperLink>
+                    <br/>
+                    <div>
+                        <%--<asp:HyperLink runat="server" ID="DelGroup"
+                                       NavigateUrl='<%# "~/AdminPages/Confirm.aspx?gid=" + Server.UrlEncode(Request.Params["gid"].ToString()) %>' >Delete Group</asp:HyperLink>--%>
+                        <asp:Button runat="server" ID="DelButton" Text="Delete group" OnClick="DelButton_OnClick"/>
+                    </div>
+                    
                 </ContentTemplate>
             </asp:RoleGroup>
         </RoleGroups>
+        
     </asp:LoginView>
 </asp:Content>
 

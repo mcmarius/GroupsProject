@@ -33,7 +33,7 @@
             <asp:DropDownList runat="server" ID="CategoryList" DataSourceID="SqlDataSource" DataTextField="CategoryName" DataValueField="CategoryId"></asp:DropDownList>
             <asp:SqlDataSource runat="server" ID="SqlDataSource" ConnectionString="<%$ConnectionStrings:ConnectionString %>" SelectCommand="SELECT [CategoryName], [CategoryId] FROM [Categories] ORDER BY [CategoryId]"></asp:SqlDataSource>
             
-            <asp:Label runat="server" ID="NewCategoryLabel" Text="New category" Visible="False"></asp:Label>
+            <asp:Label runat="server" ID="NewCategoryLabel" Text="New category name" Visible="False"></asp:Label>
             <br/>
             <asp:TextBox runat="server" ID="NewCategory" Visible="False"></asp:TextBox>
             <br/>

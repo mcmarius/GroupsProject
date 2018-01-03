@@ -13,8 +13,7 @@
         <div>
             <h1>Groups!</h1>
             
-            <asp:Parameter Name="username" Type="String" DefaultValue="Anonymous" />
-            
+                        
             
             <asp:HyperLink ID="HyperLink1" NavigateUrl="~/Index.aspx" runat="server">Home</asp:HyperLink>
             
@@ -24,6 +23,9 @@
                 <AnonymousTemplate>
                     <asp:HyperLink ID="HyperLink3" NavigateUrl="~/Signup.aspx" runat="server">Sign up</asp:HyperLink>
                     <%--<asp:HyperLink ID="HyperLink4" NavigateUrl="~/Signin.aspx" runat="server">Sign in</asp:HyperLink>--%>
+                    <br/>
+                    <br/>
+                    <%--You are not logged in!--%>
                 </AnonymousTemplate>
                 <LoggedInTemplate>
                     <asp:HyperLink runat="server" NavigateUrl="UserPages/MyGroups.aspx">My groups</asp:HyperLink>
@@ -53,6 +55,7 @@
                 </AnonymousTemplate>
                 <LoggedInTemplate>
                     Hi, <asp:LoginName ID="LoginName1" runat="server" />
+                    <br/>
                     <asp:LoginStatus ID="LoginStatus1" runat="server" />
                 </LoggedInTemplate>
                 <RoleGroups>

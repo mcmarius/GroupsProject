@@ -81,7 +81,7 @@ public partial class GroupPage : System.Web.UI.Page
                     if (isMod) { hidIsMod.Value = "true"; }
                     else { hidIsMod.Value = "false"; }
 
-                    
+                    //loadPosts(con, gid);
                     // apoi afisam postarile, fisierele, activitatile
                 }
                 catch (Exception exception)

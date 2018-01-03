@@ -16,6 +16,7 @@ public partial class CreateAdmin : System.Web.UI.Page
 
     protected void CreateUserWizard1_OnCreatedAdmin(object sender, EventArgs e)
     {
+        var CreateAdminWizard = LV.FindControl("_CreateAdminWizard") as CreateUserWizard;
         Roles.AddUserToRole(CreateAdminWizard.UserName, "Admin");
     }
 }

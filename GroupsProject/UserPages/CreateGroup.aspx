@@ -14,7 +14,7 @@
             <h2>Create a new group</h2>
             <!-- todo validation -->
             <asp:Literal runat="server" ID="DBError"></asp:Literal>
-            
+            <br/>
             <asp:Label runat="server" ID="GroupNameLabel" Text="Group name"></asp:Label>
             <br/>
             <asp:TextBox runat="server" ID="GroupName"></asp:TextBox>
@@ -30,8 +30,8 @@
             </asp:DropDownList>
             
             <br/>
-            <asp:DropDownList runat="server" ID="CategoryList" DataSourceID="SqlDataSource" DataTextField="CategoryName" DataValueField="CategoryName"></asp:DropDownList>
-            <asp:SqlDataSource runat="server" ID="SqlDataSource" ConnectionString="<%$ConnectionStrings:ConnectionString %>" SelectCommand="SELECT [CategoryName] FROM [Categories]"></asp:SqlDataSource>
+            <asp:DropDownList runat="server" ID="CategoryList" DataSourceID="SqlDataSource" DataTextField="CategoryName" DataValueField="CategoryId"></asp:DropDownList>
+            <asp:SqlDataSource runat="server" ID="SqlDataSource" ConnectionString="<%$ConnectionStrings:ConnectionString %>" SelectCommand="SELECT [CategoryName], [CategoryId] FROM [Categories] ORDER BY [CategoryId]"></asp:SqlDataSource>
             
             <asp:Label runat="server" ID="NewCategoryLabel" Text="New category" Visible="False"></asp:Label>
             <br/>
@@ -42,6 +42,7 @@
             <br/>
             <asp:TextBox runat="server" ID="GroupDescription"></asp:TextBox>
             
+            <asp:Button ID="CreateButton" runat="server" Text="Create!" CausesValidation="True" ValidateRequestMode="Enabled" OnClick="CreateButton_OnClick"/>
         </LoggedInTemplate>
     </asp:LoginView>
 </asp:Content>

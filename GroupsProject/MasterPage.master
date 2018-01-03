@@ -13,6 +13,8 @@
         <div>
             <h1>Groups!</h1>
             
+            <asp:Parameter Name="username" Type="String" DefaultValue="Anonymous" />
+            
             
             <asp:HyperLink ID="HyperLink1" NavigateUrl="~/Index.aspx" runat="server">Home</asp:HyperLink>
             

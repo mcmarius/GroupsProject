@@ -171,6 +171,7 @@ public partial class CreateGroup : Page
         catch (Exception ex)
         {
             dbe.Text += "\n-" + ex.Message;
+            throw ex;
         }
     }
 }

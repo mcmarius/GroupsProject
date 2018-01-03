@@ -35,10 +35,15 @@
                 posts
                 activities
                 files --%>
+            <br/>
             
             <% if (bool.Parse(hidIsMem.Value))
                { %>
                 <asp:Button runat="server" ID="LeaveButton" Text="Leave group" OnClick="LeaveButton_OnClick"/>
+                
+                <%-- display posts --%>
+                
+                
             <% }
                else
                { %>
@@ -46,6 +51,10 @@
             <% } %>
             <%--<asp:CheckBox runat="server" ID="MemberCB" Enabled="False"/>
             <asp:CheckBox runat="server" ID="ModCB" Enabled="False"/>--%>
+            <br/>
+            <br/>
+            <asp:Button runat="server" ID="MemButton" Text="Members" OnClick="MemButton_OnClick"/>
+            <%--<asp:HyperLink runat="server" ID="HLMembers" NavigateUrl='<%# "~/GroupMembers.aspx?gid=" + Server.UrlEncode(int.Parse(Request.Params["gid"]).ToString()) %>'>Members</asp:HyperLink>--%>
             
             <%-- navigation: join if pending or oth
                 /leave if member

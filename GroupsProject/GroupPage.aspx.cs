@@ -81,7 +81,7 @@ public partial class GroupPage : System.Web.UI.Page
                     if (isMod) { hidIsMod.Value = "true"; }
                     else { hidIsMod.Value = "false"; }
 
-                    //loadPosts(con, gid);
+                    loadPosts(con, gid);
                     // apoi afisam postarile, fisierele, activitatile
                 }
                 catch (Exception exception)
@@ -102,6 +102,23 @@ public partial class GroupPage : System.Web.UI.Page
         }
     }
 
+    private void loadPosts(SqlConnection con, string gid)
+    {
+        //try
+        //{
+        //    string query = "SELECT [PostId], [PostType], [PostDate] WHERE [GroupId] = @gid";
+        //    SqlCommand cmd = new SqlCommand(query, con);
+        //    cmd.Parameters.AddWithValue("gid", gid);
+            
+        //    SqlDataReader reader = cmd.ExecuteReader();
+        //}
+        //catch (Exception e)
+        //{
+        //    StatusMsg.Text += "\n" + e.Message;
+        //    throw e;
+        //}
+    }
+
     protected void LeaveButton_OnClick(object sender, EventArgs e)
     {
         
@@ -109,7 +126,34 @@ public partial class GroupPage : System.Web.UI.Page
 
     protected void JoinButton_OnClick(object sender, EventArgs e)
     {
-        
+        try
+        {
+            string gid = Request.Params["gid"];
+            SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            con.Open();
+
+            try
+            {
+                string query = "INSERT INTO GroupsLists (UserName, GroupId, IsModerator, IsMember)" +
+                    "VALUES (@uname, @gid, @ismod, @ismem)";
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("uname", User.Identity.Name);
+                cmd.Parameters.AddWithValue("gId", gid);
+                cmd.Parameters.AddWithValue("isMod", false);
+                cmd.Parameters.AddWithValue("isMem", false);
+                cmd.ExecuteNonQuery();
+                StatusMsg.Text = "You have applied for membership in this group!";
+                Response.Redirect("~/UserPages/MyGroups.aspx");
+            }
+            catch (Exception ex)
+            {
+                StatusMsg.Text += "\n" + ex.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMsg.Text += "\n" + ex.Message;
+        }
     }
 
     protected void DelButton_OnClick(object sender, EventArgs e)
@@ -138,5 +182,10 @@ public partial class GroupPage : System.Web.UI.Page
         {
             StatusMsg.Text += "\n" + ex.Message;
         }
+    }
+
+    protected void MemButton_OnClick(object sender, EventArgs e)
+    {
+        Response.Redirect("~/GroupMembers.aspx?gid=" + Server.UrlEncode(Request.Params["gid"]));
     }
 }

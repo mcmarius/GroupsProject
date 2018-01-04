@@ -58,9 +58,11 @@
                     <br/>
                     <asp:LoginStatus ID="LoginStatus1" runat="server" />
                 </LoggedInTemplate>
-                <RoleGroups>
-                    <asp:RoleGroup runat="server" Roles="User"></asp:RoleGroup>
-                </RoleGroups>
+                <%--<RoleGroups>
+                    <asp:RoleGroup runat="server" Roles="User">
+                        <ContentTemplate></ContentTemplate>
+                    </asp:RoleGroup>
+                </RoleGroups>--%>
 
             </asp:LoginView>
         </div>

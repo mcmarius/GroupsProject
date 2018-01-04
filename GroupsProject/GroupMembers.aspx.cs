@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -90,7 +91,11 @@ public partial class GroupMembers : System.Web.UI.Page
 
     protected void CBModMod_OnCheckedChanged(object sender, EventArgs e)
     {
-        if(!bool.Parse(hidIsMod.Value))
+                var checkBox = sender as CheckBox;
+                bool ismod = checkBox.Checked;
+        var admins = Roles.GetUsersInRole("Admin");
+        
+        if(!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.Text))
             return;
         try
         {
@@ -100,8 +105,6 @@ public partial class GroupMembers : System.Web.UI.Page
             try
             {
 
-                var checkBox = sender as CheckBox;
-                bool ismod = checkBox.Checked;
 
                 string gid = Server.UrlDecode(Request.Params["gid"]);
                 // luam date despre grup din baza de date
@@ -131,7 +134,10 @@ public partial class GroupMembers : System.Web.UI.Page
 
     protected void CBMemMod_OnCheckedChanged(object sender, EventArgs e)
     {
-        if (!bool.Parse(hidIsMod.Value))
+                var checkBox = sender as CheckBox;
+                bool ismem = checkBox.Checked;
+        var admins = Roles.GetUsersInRole("Admin");
+        if (!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.Text))
             return;
         try
         {
@@ -140,8 +146,6 @@ public partial class GroupMembers : System.Web.UI.Page
 
             try
             {
-                var checkBox = sender as CheckBox;
-                bool ismem = checkBox.Checked;
 
                 string gid = Server.UrlDecode(Request.Params["gid"]);
                 // luam date despre grup din baza de date

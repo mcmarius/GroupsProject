@@ -124,14 +124,80 @@ public partial class GroupPage : System.Web.UI.Page
 
     protected void LeaveButton_OnClick(object sender, EventArgs e)
     {
-        
+        string gid = Server.UrlDecode(Request.Params["gid"]);
+        bool redirect = true;
+        try
+        {
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            con.Open();
+            try
+            {
+                int count = 0;
+                string queryMods = "SELECT COUNT(*) AS 'c' FROM GroupsLists WHERE GroupId = @gid AND IsModerator = 1";
+                SqlCommand qcom = new SqlCommand(queryMods, con);
+                qcom.Parameters.AddWithValue("gid", gid);
+                SqlDataReader reader = qcom.ExecuteReader();
+                while (reader.Read())
+                {
+                    count = int.Parse(reader["c"].ToString());
+                }
+                reader.Close();
+                
+                // now get user's rights
+                bool isMod = false;
+                string qUsr = "SELECT IsModerator FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
+                SqlCommand cmdU = new SqlCommand(qUsr, con);
+                cmdU.Parameters.AddWithValue("uname", User.Identity.Name);
+                cmdU.Parameters.AddWithValue("gid", gid);
+                reader = cmdU.ExecuteReader();
+                while (reader.Read())
+                {
+                    isMod = bool.Parse(reader["IsModerator"].ToString());
+                }
+                reader.Close();
+
+                if (count > 1 || (count == 1 && !isMod))
+                {
+                    // remove thyself
+                    string query = "DELETE FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("uname", User.Identity.Name);
+                    cmd.Parameters.AddWithValue("gid", gid);
+                    cmd.ExecuteNonQuery();
+                    Response.Redirect("~/UserPages/MyGroups.aspx");
+                }
+                else
+                {
+                    StatusMsg.Text = "You can't leave this group because you are the only moderator!";
+                    redirect = false;
+                }
+            }
+            catch (Exception exception)
+            {
+                StatusMsg.Text += "\n" + exception.Message;
+            }
+            finally
+            {
+                con.Close();
+                if (redirect)
+                {
+                    Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMsg.Text += "\n" + ex.Message;
+        }
     }
 
     protected void JoinButton_OnClick(object sender, EventArgs e)
     {
         try
         {
-            string gid = Request.Params["gid"];
+            string gid = Server.UrlDecode(Request.Params["gid"]);
             SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
 
@@ -163,7 +229,7 @@ public partial class GroupPage : System.Web.UI.Page
     {
         try
         {
-            string gid = Request.Params["gid"];
+            string gid = Server.UrlDecode(Request.Params["gid"]);
             SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
             

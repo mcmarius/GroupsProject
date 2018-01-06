@@ -73,9 +73,11 @@ public partial class GroupMembers : System.Web.UI.Page
             reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                hidGName.Value = GNameLit.Text = reader["GroupName"].ToString();
+                hidGName.Value = GNameLink.Text = reader["GroupName"].ToString();
             }
             reader.Close();
+            
+            GNameLink.NavigateUrl = "~/GroupPage.aspx?gid=" + Server.UrlEncode(gid_.ToString());
         }
         catch (Exception ex)
         {
@@ -96,7 +98,7 @@ public partial class GroupMembers : System.Web.UI.Page
         bool ismod = checkBox.Checked;
         /*var admins = Roles.GetUsersInRole("Admin");
 
-        if (!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.Text))
+        if (!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.ToolTip))
         {
             //💩
             Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
@@ -109,7 +111,16 @@ public partial class GroupMembers : System.Web.UI.Page
 
             try
             {
-
+                int count = 0;
+                string queryMods = "SELECT COUNT(*) AS 'c' FROM GroupsLists WHERE GroupId = @gid AND IsModerator = 1";
+                SqlCommand qcom = new SqlCommand(queryMods, con);
+                qcom.Parameters.AddWithValue("gid", gid);
+                SqlDataReader reader = qcom.ExecuteReader();
+                while (reader.Read())
+                {
+                    count = int.Parse(reader["c"].ToString());
+                }
+                reader.Close();
 
                 // luam date despre grup din baza de date
                 
@@ -125,16 +136,16 @@ public partial class GroupMembers : System.Web.UI.Page
                     cmd.Parameters.AddWithValue("ismem", true);
                     cmd.ExecuteNonQuery();
                 }
-                else
+                else if (count > 1 && !ismod)
                 {
                     query = "UPDATE GroupsLists SET IsModerator=@ismod " +
                             "WHERE GroupId = @gid AND UserName = @uname";
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("gid", gid);
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("gid", gid);
                     Debug.Assert(checkBox != null, nameof(checkBox) + " != null");
                     cmd.Parameters.AddWithValue("uname", checkBox.ToolTip);
-                cmd.Parameters.AddWithValue("ismod", false);
-                cmd.ExecuteNonQuery();
+                    cmd.Parameters.AddWithValue("ismod", false);
+                    cmd.ExecuteNonQuery();
                 }
 
             }
@@ -156,12 +167,12 @@ public partial class GroupMembers : System.Web.UI.Page
 
     protected void CBMemMod_OnCheckedChanged(object sender, EventArgs e)
     {
-                string gid = Server.UrlDecode(Request.Params["gid"]);
-                var checkBox = sender as CheckBox;
+        string gid = Server.UrlDecode(Request.Params["gid"]);
+        var checkBox = sender as CheckBox;
         Debug.Assert(checkBox != null, nameof(checkBox) + " != null");
         bool ismem = checkBox.Checked;
         var admins = Roles.GetUsersInRole("Admin");
-        if (!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.Text))
+        if (!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.ToolTip))
         {
             Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
             return;
@@ -173,6 +184,30 @@ public partial class GroupMembers : System.Web.UI.Page
 
             try
             {
+                int count = 0;
+                string queryMods = "SELECT COUNT(*) AS 'c' FROM GroupsLists WHERE GroupId = @gid AND IsModerator = 1";
+                SqlCommand qcom = new SqlCommand(queryMods, con);
+                qcom.Parameters.AddWithValue("gid", gid);
+                SqlDataReader reader = qcom.ExecuteReader();
+                while (reader.Read())
+                {
+                    count = int.Parse(reader["c"].ToString());
+                }
+                reader.Close();
+
+                // now get user's rights
+                bool isMod = false;
+                string qUsr = "SELECT IsModerator FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
+                SqlCommand cmdU = new SqlCommand(qUsr, con);
+                cmdU.Parameters.AddWithValue("uname", checkBox.ToolTip);
+                cmdU.Parameters.AddWithValue("gid", gid);
+                reader = cmdU.ExecuteReader();
+                while (reader.Read())
+                {
+                    isMod = bool.Parse(reader["IsModerator"].ToString());
+                }
+                reader.Close();
+
 
                 // luam date despre grup din baza de date
                 if (ismem)
@@ -185,7 +220,7 @@ public partial class GroupMembers : System.Web.UI.Page
                     cmd.Parameters.AddWithValue("ismem", true);
                     cmd.ExecuteNonQuery();
                 }
-                else
+                else if (count > 1 || (count == 1 && !isMod))
                 {       // if no longer member, you shouldn't be mod
                     string query = "UPDATE GroupsLists SET IsMember=@ismem, IsModerator=@ismod " +
                                    "WHERE GroupId = @gid AND UserName = @uname";

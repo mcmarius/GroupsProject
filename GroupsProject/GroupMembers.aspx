@@ -5,7 +5,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
     
     <h2>Members</h2>
-    <asp:Literal runat="server" ID="GNameLit"></asp:Literal>
+    <asp:HyperLink runat="server" ID="GNameLink"></asp:HyperLink>
     <%--<asp:GridView runat="server" ID="GV" DataSourceID="GMem"></asp:GridView>--%>
     <asp:Literal runat="server" ID="StatusMsg"></asp:Literal>
     <br/>

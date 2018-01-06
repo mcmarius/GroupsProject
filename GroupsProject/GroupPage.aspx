@@ -38,7 +38,7 @@
                 files --%>
             <br/>
             
-            <% if (bool.Parse(hidIsMem.Value))
+            <% if (bool.Parse(hidMem.Value))
                { %>
                 <asp:Button runat="server" ID="LeaveButton" Text="Leave group" OnClick="LeaveButton_OnClick"/>
                 
@@ -46,7 +46,7 @@
                 
                 
             <% }
-               else if(!bool.Parse(hidMem.Value))
+               else //if(!bool.Parse(hidMem.Value))
                { %>
                 <asp:Button runat="server" ID="JoinButton" Text="Join group" OnClick="JoinButton_OnClick"/>
             <% } %>

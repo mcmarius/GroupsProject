@@ -22,6 +22,7 @@
     <asp:Literal runat="server" ID="CategoryLiteral"></asp:Literal>
     <br/>
     
+    <asp:HiddenField runat="server" ID="hidMem" Value="false"/>
     <asp:HiddenField runat="server" ID="hidIsMem" Value="false"/>
     <asp:HiddenField runat="server" ID="hidIsMod" Value="false"/>
     
@@ -45,7 +46,7 @@
                 
                 
             <% }
-               else
+               else if(!bool.Parse(hidMem.Value))
                { %>
                 <asp:Button runat="server" ID="JoinButton" Text="Join group" OnClick="JoinButton_OnClick"/>
             <% } %>
@@ -53,7 +54,6 @@
             <asp:CheckBox runat="server" ID="ModCB" Enabled="False"/>--%>
             <br/>
             <br/>
-            <%--<asp:HyperLink runat="server" ID="HLMembers" NavigateUrl='<%# "~/GroupMembers.aspx?gid=" + Server.UrlEncode(int.Parse(Request.Params["gid"]).ToString()) %>'>Members</asp:HyperLink>--%>
             
             <%-- navigation: join if pending or oth
                 /leave if member
@@ -64,6 +64,7 @@
             
         </LoggedInTemplate>
     </asp:LoginView>
+            <%--<asp:HyperLink runat="server" ID="HLMembers">Members</asp:HyperLink>--%>
             <asp:Button runat="server" ID="MemButton" Text="Members" OnClick="MemButton_OnClick"/>
     <asp:LoginView runat="server" ID="LV2">
         <RoleGroups>

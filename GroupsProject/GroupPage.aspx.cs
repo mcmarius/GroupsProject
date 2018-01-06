@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Web.UI.WebControls;
 
 public partial class GroupPage : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        int gid_ = 0;
         try
         {
-            int unused = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
+            gid_ = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
         }
         catch (Exception exception)
         {
@@ -20,6 +22,7 @@ public partial class GroupPage : System.Web.UI.Page
             int catId = 0;
             bool isMod = false;
             bool isMem = false;
+            bool mem = false;
             
             try
             {
@@ -66,15 +69,18 @@ public partial class GroupPage : System.Web.UI.Page
                         //var modCB = LV.FindControl("ModCB") as CheckBox;
                         //var memberCB = LV.FindControl("MemberCB") as CheckBox;
                         //modCB.Checked = 
+                        mem = true;
                             isMod = bool.Parse(reader["IsModerator"].ToString());
                         //memberCB.Checked = 
                             isMem = bool.Parse(reader["IsMember"].ToString());
                     }
 
                     if (isMem){ hidIsMem.Value = "true"; }
-                    else { hidIsMem.Value = "false"; }
+                    // else { hidIsMem.Value = "false"; }
                     if (isMod) { hidIsMod.Value = "true"; }
-                    else { hidIsMod.Value = "false"; }
+                    // else { hidIsMod.Value = "false"; }
+                    if (mem) { hidMem.Value = "true"; }
+                    
 
                     loadPosts(con, gid);
                     // apoi afisam postarile, fisierele, activitatile
@@ -94,6 +100,8 @@ public partial class GroupPage : System.Web.UI.Page
             {
                 StatusMsg.Text += "\n" + ex.Message;
             }
+            
+            //HLMembers.NavigateUrl = "~/GroupMembers.aspx?gid=" + Server.UrlEncode(gid_.ToString());
         }
     }
 

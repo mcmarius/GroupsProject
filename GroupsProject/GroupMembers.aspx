@@ -29,13 +29,13 @@
                                                      OnCheckedChanged="CBMemMod_OnCheckedChanged"
                                                      ID="CBMemMod"
                                                      Checked='<%# DataBinder.Eval(Container.DataItem, "IsMember") %>'
-                                                     Text='<%# DataBinder.Eval(Container.DataItem, "UserName") %>'/>
+                                                     ToolTip='<%# DataBinder.Eval(Container.DataItem, "UserName") %>'/>
                     </div><div>
                     Mod status: <asp:CheckBox runat="server" AutoPostBack="True" Enabled="True"
                                               OnCheckedChanged="CBModMod_OnCheckedChanged"
                                               ID="CBModMod"
                                               Checked='<%# DataBinder.Eval(Container.DataItem, "IsModerator") %>'
-                                              Text='<%# DataBinder.Eval(Container.DataItem, "UserName") %>'/>
+                                              ToolTip='<%# DataBinder.Eval(Container.DataItem, "UserName") %>'/>
                 </div>
                 <% }
                    else

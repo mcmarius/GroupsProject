@@ -9,9 +9,10 @@ public partial class GroupMembers : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        int gid_ = 0;
         try
         {
-            var unused = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
+            gid_ = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
         }
         catch (Exception exception)
         {
@@ -119,7 +120,7 @@ public partial class GroupMembers : System.Web.UI.Page
                             "WHERE GroupId = @gid AND UserName = @uname";
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("gid", gid);
-                    cmd.Parameters.AddWithValue("uname", checkBox.Text);
+                    cmd.Parameters.AddWithValue("uname", checkBox.ToolTip);
                     cmd.Parameters.AddWithValue("ismod", true);
                     cmd.Parameters.AddWithValue("ismem", true);
                     cmd.ExecuteNonQuery();
@@ -131,7 +132,7 @@ public partial class GroupMembers : System.Web.UI.Page
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("gid", gid);
                     Debug.Assert(checkBox != null, nameof(checkBox) + " != null");
-                    cmd.Parameters.AddWithValue("uname", checkBox.Text);
+                    cmd.Parameters.AddWithValue("uname", checkBox.ToolTip);
                 cmd.Parameters.AddWithValue("ismod", false);
                 cmd.ExecuteNonQuery();
                 }
@@ -180,7 +181,7 @@ public partial class GroupMembers : System.Web.UI.Page
                                    "WHERE GroupId = @gid AND UserName = @uname";
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("gid", gid);
-                    cmd.Parameters.AddWithValue("uname", checkBox.Text);
+                    cmd.Parameters.AddWithValue("uname", checkBox.ToolTip);
                     cmd.Parameters.AddWithValue("ismem", true);
                     cmd.ExecuteNonQuery();
                 }
@@ -190,7 +191,7 @@ public partial class GroupMembers : System.Web.UI.Page
                                    "WHERE GroupId = @gid AND UserName = @uname";
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("gid", gid);
-                    cmd.Parameters.AddWithValue("uname", checkBox.Text);
+                    cmd.Parameters.AddWithValue("uname", checkBox.ToolTip);
                     cmd.Parameters.AddWithValue("ismem", false);
                     cmd.Parameters.AddWithValue("ismod", false);
                     cmd.ExecuteNonQuery();

@@ -4,8 +4,8 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
     
-    <h2>Members</h2>
-    <asp:HyperLink runat="server" ID="GNameLink"></asp:HyperLink>
+    <h2>Members of <%= hidGName.Value%></h2>
+    <asp:HyperLink runat="server" ID="GNameLink" Text="Group page"></asp:HyperLink>
     <%--<asp:GridView runat="server" ID="GV" DataSourceID="GMem"></asp:GridView>--%>
     <asp:Literal runat="server" ID="StatusMsg"></asp:Literal>
     <br/>

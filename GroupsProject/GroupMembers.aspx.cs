@@ -9,10 +9,10 @@ public partial class GroupMembers : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        int gid_ = 0;
+        int gid2 = 0;
         try
         {
-            gid_ = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
+            gid2 = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
         }
         catch (Exception exception)
         {
@@ -73,11 +73,11 @@ public partial class GroupMembers : System.Web.UI.Page
             reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                hidGName.Value = GNameLink.Text = reader["GroupName"].ToString();
+                hidGName.Value = reader["GroupName"].ToString();
             }
             reader.Close();
             
-            GNameLink.NavigateUrl = "~/GroupPage.aspx?gid=" + Server.UrlEncode(gid_.ToString());
+            GNameLink.NavigateUrl = "~/GroupPage.aspx?gid=" + Server.UrlEncode(gid2.ToString());
         }
         catch (Exception ex)
         {
@@ -136,7 +136,7 @@ public partial class GroupMembers : System.Web.UI.Page
                     cmd.Parameters.AddWithValue("ismem", true);
                     cmd.ExecuteNonQuery();
                 }
-                else if (count > 1 && !ismod)
+                if (count > 1 && !ismod)
                 {
                     query = "UPDATE GroupsLists SET IsModerator=@ismod " +
                             "WHERE GroupId = @gid AND UserName = @uname";

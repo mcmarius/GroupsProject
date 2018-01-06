@@ -64,8 +64,8 @@
             
         </LoggedInTemplate>
     </asp:LoginView>
-            <%--<asp:HyperLink runat="server" ID="HLMembers">Members</asp:HyperLink>--%>
-            <asp:Button runat="server" ID="MemButton" Text="Members" OnClick="MemButton_OnClick"/>
+            <asp:HyperLink runat="server" ID="HLMembers">Members</asp:HyperLink>
+            <%--<asp:Button runat="server" ID="MemButton" Text="Members" OnClick="MemButton_OnClick"/>--%>
     <asp:LoginView runat="server" ID="LV2">
         <RoleGroups>
             <asp:RoleGroup Roles="Admin">

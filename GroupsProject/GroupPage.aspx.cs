@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web.Security;
-using System.Web.UI.WebControls;
 
 public partial class GroupPage : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        int gid_ = 0;
+        int gid2 = 0;
         try
         {
-            gid_ = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
+            gid2 = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
         }
         catch (Exception exception)
         {
@@ -103,7 +100,7 @@ public partial class GroupPage : System.Web.UI.Page
                 StatusMsg.Text += "\n" + ex.Message;
             }
             
-            //HLMembers.NavigateUrl = "~/GroupMembers.aspx?gid=" + Server.UrlEncode(gid_.ToString());
+            HLMembers.NavigateUrl = "~/GroupMembers.aspx?gid=" + Server.UrlEncode(gid2.ToString());
         }
     }
 

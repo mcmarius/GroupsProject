@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
-using System.Web;
 using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
 public partial class GroupMembers : System.Web.UI.Page
@@ -13,7 +11,7 @@ public partial class GroupMembers : System.Web.UI.Page
     {
         try
         {
-            int.Parse(Request.Params["gid"]);
+            var unused = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
         }
         catch (Exception exception)
         {
@@ -91,12 +89,18 @@ public partial class GroupMembers : System.Web.UI.Page
 
     protected void CBModMod_OnCheckedChanged(object sender, EventArgs e)
     {
-                var checkBox = sender as CheckBox;
-                bool ismod = checkBox.Checked;
-        var admins = Roles.GetUsersInRole("Admin");
-        
-        if(!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.Text))
+        string gid = Server.UrlDecode(Request.Params["gid"]);
+        var checkBox = sender as CheckBox;
+        Debug.Assert(checkBox != null, nameof(checkBox) + " != null");
+        bool ismod = checkBox.Checked;
+        /*var admins = Roles.GetUsersInRole("Admin");
+
+        if (!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.Text))
+        {
+            //💩
+            Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
             return;
+        }*/
         try
         {
             SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
@@ -106,15 +110,31 @@ public partial class GroupMembers : System.Web.UI.Page
             {
 
 
-                string gid = Server.UrlDecode(Request.Params["gid"]);
                 // luam date despre grup din baza de date
-                string query = "UPDATE GroupsLists SET IsModerator=@ismod " +
-                               "WHERE GroupId = @gid AND UserName = @uname";
+                
+                string query;
+                if (ismod)  // if you become mod, you should also be member
+                {
+                    query = "UPDATE GroupsLists SET IsModerator=@ismod, IsMember=@ismem " +
+                            "WHERE GroupId = @gid AND UserName = @uname";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("gid", gid);
+                    cmd.Parameters.AddWithValue("uname", checkBox.Text);
+                    cmd.Parameters.AddWithValue("ismod", true);
+                    cmd.Parameters.AddWithValue("ismem", true);
+                    cmd.ExecuteNonQuery();
+                }
+                else
+                {
+                    query = "UPDATE GroupsLists SET IsModerator=@ismod " +
+                            "WHERE GroupId = @gid AND UserName = @uname";
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("gid", gid);
-                cmd.Parameters.AddWithValue("uname", checkBox.Text);
-                cmd.Parameters.AddWithValue("ismod", ismod);
+                    Debug.Assert(checkBox != null, nameof(checkBox) + " != null");
+                    cmd.Parameters.AddWithValue("uname", checkBox.Text);
+                cmd.Parameters.AddWithValue("ismod", false);
                 cmd.ExecuteNonQuery();
+                }
 
             }
             catch (Exception exception)
@@ -124,6 +144,7 @@ public partial class GroupMembers : System.Web.UI.Page
             finally
             {
                 con.Close();
+                Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
             }
         }
         catch (Exception ex)
@@ -134,11 +155,16 @@ public partial class GroupMembers : System.Web.UI.Page
 
     protected void CBMemMod_OnCheckedChanged(object sender, EventArgs e)
     {
+                string gid = Server.UrlDecode(Request.Params["gid"]);
                 var checkBox = sender as CheckBox;
-                bool ismem = checkBox.Checked;
+        Debug.Assert(checkBox != null, nameof(checkBox) + " != null");
+        bool ismem = checkBox.Checked;
         var admins = Roles.GetUsersInRole("Admin");
         if (!bool.Parse(hidIsMod.Value) || admins.Contains(checkBox.Text))
+        {
+            Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
             return;
+        }
         try
         {
             SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
@@ -147,16 +173,29 @@ public partial class GroupMembers : System.Web.UI.Page
             try
             {
 
-                string gid = Server.UrlDecode(Request.Params["gid"]);
                 // luam date despre grup din baza de date
-                string query = "UPDATE GroupsLists SET IsMember=@ismem " +
-                                    "WHERE GroupId = @gid AND UserName = @uname";
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("gid", gid);
-                cmd.Parameters.AddWithValue("uname", checkBox.Text);
-                cmd.Parameters.AddWithValue("ismem", ismem);
-                cmd.ExecuteNonQuery();
-                
+                if (ismem)
+                {
+                    string query = "UPDATE GroupsLists SET IsMember=@ismem " +
+                                   "WHERE GroupId = @gid AND UserName = @uname";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("gid", gid);
+                    cmd.Parameters.AddWithValue("uname", checkBox.Text);
+                    cmd.Parameters.AddWithValue("ismem", true);
+                    cmd.ExecuteNonQuery();
+                }
+                else
+                {       // if no longer member, you shouldn't be mod
+                    string query = "UPDATE GroupsLists SET IsMember=@ismem, IsModerator=@ismod " +
+                                   "WHERE GroupId = @gid AND UserName = @uname";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("gid", gid);
+                    cmd.Parameters.AddWithValue("uname", checkBox.Text);
+                    cmd.Parameters.AddWithValue("ismem", false);
+                    cmd.Parameters.AddWithValue("ismod", false);
+                    cmd.ExecuteNonQuery();
+                }
+
             }
             catch (Exception exception)
             {
@@ -165,6 +204,7 @@ public partial class GroupMembers : System.Web.UI.Page
             finally
             {
                 con.Close();
+                Response.Redirect("GroupPage.aspx?gid="+Server.UrlEncode(gid));
             }
         }
         catch (Exception ex)

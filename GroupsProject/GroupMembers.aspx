@@ -57,7 +57,7 @@
     <asp:SqlDataSource runat="server" ID="GMem" ConnectionString="<%$ConnectionStrings:ConnectionString %>"
                        SelectCommand="SELECT [UserName],[IsModerator],[IsMember] FROM GroupsLists WHERE GroupId=@gid" OnSelecting="GMem_OnSelecting">
         <SelectParameters>
-            <asp:Parameter runat="server" Name="gid"/>
+            <asp:Parameter Name="gid"/>
         </SelectParameters>
     </asp:SqlDataSource>
 </asp:Content>

@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Web;
 using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
-public partial class CreateAdmin : System.Web.UI.Page
+namespace AdminPages
 {
-    protected void Page_Load(object sender, EventArgs e)
+    public partial class CreateAdmin : System.Web.UI.Page
     {
+        protected void Page_Load(object sender, EventArgs e)
+        {
 
-    }
+        }
 
-    protected void CreateUserWizard1_OnCreatedAdmin(object sender, EventArgs e)
-    {
-        var CreateAdminWizard = LV.FindControl("_CreateAdminWizard") as CreateUserWizard;
-        Roles.AddUserToRole(CreateAdminWizard.UserName, "Admin");
+        protected void CreateUserWizard1_OnCreatedAdmin(object sender, EventArgs e)
+        {
+            var createAdminWizard = LV.FindControl("_CreateAdminWizard") as CreateUserWizard;
+            if (createAdminWizard != null) Roles.AddUserToRole(createAdminWizard.UserName, "Admin");
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="Confirm.aspx.cs" Inherits="AdminPages_Confirm" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="Confirm.aspx.cs" Inherits="AdminPages.Confirm" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -8,7 +8,7 @@
             You are not logged in!
         </AnonymousTemplate>
         <RoleGroups>
-            <asp:RoleGroup runat="server" Roles="Admin">
+            <asp:RoleGroup Roles="Admin">
                 <ContentTemplate>
                     Are you sure?
                     <>br>

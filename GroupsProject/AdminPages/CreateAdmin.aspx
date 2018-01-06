@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="CreateAdmin.aspx.cs" Inherits="CreateAdmin" %>
+﻿<%@ Page Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="CreateAdmin.aspx.cs" Inherits="AdminPages.CreateAdmin" %>
 
 <asp:Content ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <%--<asp:CreateUserWizard ID="CreateAdminWizard" runat="server"
@@ -18,12 +18,12 @@
             <%Response.Redirect("~/Index.aspx"); %>
         </AnonymousTemplate>
         <RoleGroups>
-            <asp:RoleGroup runat="server" Roles="User">
+            <asp:RoleGroup Roles="User">
                 <ContentTemplate><% Response.Redirect("~/Index.aspx"); %></ContentTemplate>
             </asp:RoleGroup>
         </RoleGroups>
         <RoleGroups>
-            <asp:RoleGroup  runat="server" Roles="Admin">
+            <asp:RoleGroup Roles="Admin">
                 <ContentTemplate>
                     <asp:CreateUserWizard ID="_CreateAdminWizard" runat="server"
                                           OnCreatedUser="CreateUserWizard1_OnCreatedAdmin">

@@ -53,7 +53,6 @@
             <asp:CheckBox runat="server" ID="ModCB" Enabled="False"/>--%>
             <br/>
             <br/>
-            <asp:Button runat="server" ID="MemButton" Text="Members" OnClick="MemButton_OnClick"/>
             <%--<asp:HyperLink runat="server" ID="HLMembers" NavigateUrl='<%# "~/GroupMembers.aspx?gid=" + Server.UrlEncode(int.Parse(Request.Params["gid"]).ToString()) %>'>Members</asp:HyperLink>--%>
             
             <%-- navigation: join if pending or oth
@@ -65,9 +64,10 @@
             
         </LoggedInTemplate>
     </asp:LoginView>
+            <asp:Button runat="server" ID="MemButton" Text="Members" OnClick="MemButton_OnClick"/>
     <asp:LoginView runat="server" ID="LV2">
         <RoleGroups>
-            <asp:RoleGroup runat="server" Roles="Admin">
+            <asp:RoleGroup Roles="Admin">
                 <ContentTemplate>
                     <br/>
                     <div>

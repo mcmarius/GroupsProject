@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 public partial class GroupPage : System.Web.UI.Page
 {
@@ -12,12 +7,12 @@ public partial class GroupPage : System.Web.UI.Page
     {
         try
         {
-            int.Parse(Request.Params["gid"]);
+            int unused = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());
         }
         catch (Exception exception)
         {
             Response.Redirect("~/UserPages/MyGroups.aspx");
-            Console.WriteLine(exception.Message);
+            Console.WriteLine(exception.Message + "\n");
         }
         if (Request.Params["gid"] != null)
         {

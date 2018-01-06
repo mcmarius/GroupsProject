@@ -1,5 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="MyGroups.aspx.cs" Inherits="MyGroups" %>
-<%@ Import Namespace="System.Net" %>
+﻿<%@ Page Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="MyGroups.aspx.cs" Inherits="UserPages.MyGroups" %>
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">

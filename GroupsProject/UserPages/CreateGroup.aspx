@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Create a group" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="CreateGroup.aspx.cs" Inherits="CreateGroup" %>
+﻿<%@ Page Title="Create a group" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="CreateGroup.aspx.cs" Inherits="UserPages.CreateGroup" %>
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
@@ -25,8 +25,8 @@
             <asp:DropDownList ID="CategoryDropDownList" runat="server" AutoPostBack="True"
                               OnSelectedIndexChanged="CategoryDropDownList_OnSelectedIndexChanged"
                               ViewStateMode="Enabled" EnableViewState="True">
-                <asp:ListItem runat="server" Text="Existing category" Value="1"></asp:ListItem>
-                <asp:ListItem runat="server" Text="New category" Value="2"></asp:ListItem>
+                <asp:ListItem Text="Existing category" Value="1"></asp:ListItem>
+                <asp:ListItem Text="New category" Value="2"></asp:ListItem>
             </asp:DropDownList>
             
             <br/>

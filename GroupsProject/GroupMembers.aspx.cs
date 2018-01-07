@@ -76,7 +76,7 @@ public partial class GroupMembers : System.Web.UI.Page
                 hidGName.Value = reader["GroupName"].ToString();
             }
             reader.Close();
-            
+
             GNameLink.NavigateUrl = "~/GroupPage.aspx?gid=" + Server.UrlEncode(gid2.ToString());
         }
         catch (Exception ex)
@@ -106,7 +106,9 @@ public partial class GroupMembers : System.Web.UI.Page
         }*/
         try
         {
-            SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
 
             try
@@ -123,9 +125,9 @@ public partial class GroupMembers : System.Web.UI.Page
                 reader.Close();
 
                 // luam date despre grup din baza de date
-                
+
                 string query;
-                if (ismod)  // if you become mod, you should also be member
+                if (ismod) // if you become mod, you should also be member
                 {
                     query = "UPDATE GroupsLists SET IsModerator=@ismod, IsMember=@ismem " +
                             "WHERE GroupId = @gid AND UserName = @uname";
@@ -179,7 +181,9 @@ public partial class GroupMembers : System.Web.UI.Page
         }
         try
         {
-            SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
 
             try
@@ -221,7 +225,8 @@ public partial class GroupMembers : System.Web.UI.Page
                     cmd.ExecuteNonQuery();
                 }
                 else if (count > 1 || (count == 1 && !isMod))
-                {       // if no longer member, you shouldn't be mod
+                {
+                    // if no longer member, you shouldn't be mod
                     string query = "UPDATE GroupsLists SET IsMember=@ismem, IsModerator=@ismod " +
                                    "WHERE GroupId = @gid AND UserName = @uname";
                     SqlCommand cmd = new SqlCommand(query, con);
@@ -240,12 +245,99 @@ public partial class GroupMembers : System.Web.UI.Page
             finally
             {
                 con.Close();
-                Response.Redirect("GroupPage.aspx?gid="+Server.UrlEncode(gid));
+                Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
             }
         }
         catch (Exception ex)
         {
             StatusMsg.Text += "\n" + ex.Message;
+        }
+    }
+
+    protected void KickButton_OnClick(object sender, EventArgs e)
+    {
+        var button = sender as Button;
+        string gid = Server.UrlDecode(Request.Params["gid"]);
+        bool redirect = true;
+        try
+        {
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            con.Open();
+            try
+            {
+                int count = 0;
+                string queryMods = "SELECT COUNT(*) AS 'c' FROM GroupsLists WHERE GroupId = @gid AND IsModerator = 1";
+                SqlCommand qcom = new SqlCommand(queryMods, con);
+                qcom.Parameters.AddWithValue("gid", gid);
+                SqlDataReader reader = qcom.ExecuteReader();
+                while (reader.Read())
+                {
+                    count = int.Parse(reader["c"].ToString());
+                }
+                reader.Close();
+
+                // now get user's rights
+                bool isMod = false;
+                string qUsr = "SELECT IsModerator FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
+                SqlCommand cmdU = new SqlCommand(qUsr, con);
+                cmdU.Parameters.AddWithValue("uname", button.ToolTip);
+                cmdU.Parameters.AddWithValue("gid", gid);
+                reader = cmdU.ExecuteReader();
+                while (reader.Read())
+                {
+                    isMod = bool.Parse(reader["IsModerator"].ToString());
+                }
+                reader.Close();
+
+                if (count > 1 || (count == 1 && !isMod))
+                {
+                    // remove this user
+                    string query = "DELETE FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("uname", button.ToolTip);
+                    cmd.Parameters.AddWithValue("gid", gid);
+                    cmd.ExecuteNonQuery();
+                    Response.Redirect("~/UserPages/MyGroups.aspx");
+                }
+                else
+                {
+                    StatusMsg.Text = "You can't leave this group because you are the only moderator!";
+                    redirect = false;
+                }
+            }
+            catch (Exception exception)
+            {
+                StatusMsg.Text += "\n" + exception.Message;
+            }
+            finally
+            {
+                con.Close();
+                if (redirect)
+                {
+                    Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMsg.Text += "\n" + ex.Message;
+        }
+    }
+
+    protected void KickButton_OnPreRender(object sender, EventArgs e)
+    {
+        var button = sender as Button;
+        if (button.ToolTip == User.Identity.Name)
+        {
+            button.Visible = button.Enabled = false;
+        }
+
+        var admins = Roles.GetUsersInRole("Admin");
+        if (!bool.Parse(hidIsMod.Value) || admins.Contains(button.ToolTip))
+        {
+            button.Enabled = button.Visible = false;
         }
     }
 }

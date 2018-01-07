@@ -30,16 +30,21 @@
                                                      ID="CBMemMod"
                                                      Checked='<%# DataBinder.Eval(Container.DataItem, "IsMember") %>'
                                                      ToolTip='<%# DataBinder.Eval(Container.DataItem, "UserName") %>'/>
-                    </div><div>
+                </div><div>
                     Mod status: <asp:CheckBox runat="server" AutoPostBack="True" Enabled="True"
                                               OnCheckedChanged="CBModMod_OnCheckedChanged"
                                               ID="CBModMod"
                                               Checked='<%# DataBinder.Eval(Container.DataItem, "IsModerator") %>'
                                               ToolTip='<%# DataBinder.Eval(Container.DataItem, "UserName") %>'/>
                 </div>
-                <% }
-                   else
-                   { %>
+                    <div>
+                        <asp:Button runat="server" ID="KickButton" Text="Kick member" OnPreRender="KickButton_OnPreRender"
+                                    ToolTip='<%# DataBinder.Eval(Container.DataItem, "UserName") %>'
+                                    OnClick="KickButton_OnClick"/>
+                    </div>
+                    <% }
+                    else
+                    { %>
                     <div>
                         Member status: <asp:CheckBox runat="server" Enabled="False" ID="CBMem"
                              Checked='<%# DataBinder.Eval(Container.DataItem, "IsMember") %>'/>

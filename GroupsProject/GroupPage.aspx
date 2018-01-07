@@ -76,7 +76,10 @@
                                        NavigateUrl='<%# "~/AdminPages/Confirm.aspx?gid=" + Server.UrlEncode(Request.Params["gid"].ToString()) %>' >Delete Group</asp:HyperLink>--%>
                         <asp:Button runat="server" ID="DelButton" Text="Delete group" OnClick="DelButton_OnClick"/>
                     </div>
-                    
+                    <div>
+                        <asp:Button runat="server" ID="WarnButton" Text="Send warning!" OnClick="WarnButton_OnClick"/>
+                        <%-- on warnings page, remove warnings --%>
+                    </div>
                 </ContentTemplate>
             </asp:RoleGroup>
         </RoleGroups>

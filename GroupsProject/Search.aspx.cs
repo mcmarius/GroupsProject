@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web.UI.WebControls;
 
 public partial class Search : System.Web.UI.Page
 {
@@ -13,7 +12,7 @@ public partial class Search : System.Web.UI.Page
             " INNER JOIN[GroupsLists] ON Groups.GroupId = GroupsLists.GroupId" +
             " INNER JOIN[Categories] ON Groups.CategoryId = Categories.CategoryId" +
             " WHERE"+
-            " GroupName LIKE @query OR GroupDescription LIKE @query OR" +
+            " GroupName = N'@query' OR GroupName LIKE @query OR GroupDescription LIKE @query OR" +
             " CategoryName = N'@query' OR CategoryName LIKE @query ";
             //SqlDataSource1.SelectCommand = "SELECT DISTINCT Groups.GroupId," +
             //                               " Groups.GroupName," +
@@ -27,7 +26,7 @@ public partial class Search : System.Web.UI.Page
             //                               " CategoryName LIKE @query";
 
             SqlDataSource1.SelectParameters.Clear();
-            if (bool.Parse(Server.UrlDecode(Request.Params["s"])))
+            if (bool.Parse(Server.UrlDecode(Request.Params["s"]) ?? throw new InvalidOperationException()))
             {
                 SqlDataSource1.SelectParameters.Add("query", "" + query + "");
             }

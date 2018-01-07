@@ -30,54 +30,66 @@ public partial class GroupMembers : System.Web.UI.Page
                 new SqlConnection(
                     @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
-            // acum vedem daca userul este membru al grupului
-            string glist =
-                "SELECT [UserName], [IsModerator], [IsMember] FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
-            SqlCommand cmd3 = new SqlCommand(glist, con);
-            cmd3.Parameters.AddWithValue("uname", User.Identity.Name);
-            cmd3.Parameters.AddWithValue("gid", gid);
-            SqlDataReader reader = cmd3.ExecuteReader();
 
-            while (reader.Read())
+            try
             {
-                //var modCB = LV.FindControl("ModCB") as CheckBox;
-                //var memberCB = LV.FindControl("MemberCB") as CheckBox;
-                //modCB.Checked = 
-                isMod = bool.Parse(reader["IsModerator"].ToString());
-                //memberCB.Checked = 
-                isMem = bool.Parse(reader["IsMember"].ToString());
-            }
+                // acum vedem daca userul este membru al grupului
+                string glist =
+                    "SELECT [UserName], [IsModerator], [IsMember] FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
+                SqlCommand cmd3 = new SqlCommand(glist, con);
+                cmd3.Parameters.AddWithValue("uname", User.Identity.Name);
+                cmd3.Parameters.AddWithValue("gid", gid);
+                SqlDataReader reader = cmd3.ExecuteReader();
 
-            if (isMem)
-            {
-                hidIsMem.Value = "true";
-            }
-            else
-            {
-                hidIsMem.Value = "false";
-            }
-            if (isMod)
-            {
-                hidIsMod.Value = "true";
-            }
-            else
-            {
-                hidIsMod.Value = "false";
-            }
+                while (reader.Read())
+                {
+                    //var modCB = LV.FindControl("ModCB") as CheckBox;
+                    //var memberCB = LV.FindControl("MemberCB") as CheckBox;
+                    //modCB.Checked = 
+                    isMod = bool.Parse(reader["IsModerator"].ToString());
+                    //memberCB.Checked = 
+                    isMem = bool.Parse(reader["IsMember"].ToString());
+                }
 
-            reader.Close();
-            string groupQuery = "SELECT [GroupName] " +
-                                "FROM [Groups] WHERE GroupId = @gid";
-            SqlCommand cmd = new SqlCommand(groupQuery, con);
-            cmd.Parameters.AddWithValue("gid", gid);
-            reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                hidGName.Value = reader["GroupName"].ToString();
-            }
-            reader.Close();
+                if (isMem)
+                {
+                    hidIsMem.Value = "true";
+                }
+                else
+                {
+                    hidIsMem.Value = "false";
+                }
+                if (isMod)
+                {
+                    hidIsMod.Value = "true";
+                }
+                else
+                {
+                    hidIsMod.Value = "false";
+                }
 
-            GNameLink.NavigateUrl = "~/GroupPage.aspx?gid=" + Server.UrlEncode(gid2.ToString());
+                reader.Close();
+                string groupQuery = "SELECT [GroupName] " +
+                                    "FROM [Groups] WHERE GroupId = @gid";
+                SqlCommand cmd = new SqlCommand(groupQuery, con);
+                cmd.Parameters.AddWithValue("gid", gid);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    hidGName.Value = reader["GroupName"].ToString();
+                }
+                reader.Close();
+
+                GNameLink.NavigateUrl = "~/GroupPage.aspx?gid=" + Server.UrlEncode(gid2.ToString());
+            }
+            catch (Exception ex)
+            {
+                StatusMsg.Text += ex.Message;
+            }
+            finally
+            {
+                con.Close();
+            }
         }
         catch (Exception ex)
         {
@@ -282,6 +294,7 @@ public partial class GroupMembers : System.Web.UI.Page
                 bool isMod = false;
                 string qUsr = "SELECT IsModerator FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
                 SqlCommand cmdU = new SqlCommand(qUsr, con);
+                Debug.Assert(button != null, nameof(button) + " != null");
                 cmdU.Parameters.AddWithValue("uname", button.ToolTip);
                 cmdU.Parameters.AddWithValue("gid", gid);
                 reader = cmdU.ExecuteReader();
@@ -329,6 +342,7 @@ public partial class GroupMembers : System.Web.UI.Page
     protected void KickButton_OnPreRender(object sender, EventArgs e)
     {
         var button = sender as Button;
+        Debug.Assert(button != null, nameof(button) + " != null");
         if (button.ToolTip == User.Identity.Name)
         {
             button.Visible = button.Enabled = false;

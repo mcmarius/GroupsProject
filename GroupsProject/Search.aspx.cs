@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.UI.WebControls;
 
 public partial class Search : System.Web.UI.Page
 {
@@ -13,7 +14,7 @@ public partial class Search : System.Web.UI.Page
             " INNER JOIN[Categories] ON Groups.CategoryId = Categories.CategoryId" +
             " WHERE"+
             " GroupName LIKE @query OR GroupDescription LIKE @query OR" +
-            " CategoryName LIKE @query ";
+            " CategoryName = N'@query' OR CategoryName LIKE @query ";
             //SqlDataSource1.SelectCommand = "SELECT DISTINCT Groups.GroupId," +
             //                               " Groups.GroupName," +
             //                               " Groups.GroupDescription " +
@@ -26,13 +27,21 @@ public partial class Search : System.Web.UI.Page
             //                               " CategoryName LIKE @query";
 
             SqlDataSource1.SelectParameters.Clear();
-            SqlDataSource1.SelectParameters.Add("query", "%" + query + "%");
+            if (bool.Parse(Server.UrlDecode(Request.Params["s"])))
+            {
+                SqlDataSource1.SelectParameters.Add("query", "" + query + "");
+            }
+            else
+            {
+                SqlDataSource1.SelectParameters.Add("query", "%" + query + "%");
+            }
             SqlDataSource1.DataBind();
         }
     }
 
     protected void SearchButton_OnClick(object sender, EventArgs e)
     {
-        Response.Redirect("~/Search.aspx?query=" + Server.UrlEncode(SearchTextBox.Text));
+        Response.Redirect("~/Search.aspx?s=" + Server.UrlEncode(StrictCB.Checked.ToString())
+                          + "&query=" + Server.UrlEncode(SearchTextBox.Text));
     }
 }

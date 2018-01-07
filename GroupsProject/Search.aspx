@@ -5,8 +5,10 @@
     
     <asp:Label ID="SearchLabel" runat="server" Text="Search: "></asp:Label>
     <asp:TextBox ID="SearchTextBox" runat="server"></asp:TextBox>
-    <asp:Button ID="SearchButton" runat="server" Text="Button" OnClick="SearchButton_OnClick"/>
-    
+    <asp:Button ID="SearchButton" runat="server" Text="Search" OnClick="SearchButton_OnClick"/>
+    <br/>
+    <asp:CheckBox runat="server" ID="StrictCB" Text="Exact match"/>
+    <br/>
     <asp:Repeater runat="server" ID="MyRepeater" DataSourceID="SqlDataSource1">
         <ItemTemplate>
             <div style="padding: 10px">
@@ -28,8 +30,9 @@
 
     <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ConnectionStrings:ConnectionString %>"
                        
-                       SelectCommand="SELECT DISTINCT Groups.GroupId AS 'GID', Groups.GroupName AS 'Group Name', Groups.GroupDescription AS 'Description' FROM [Groups]
-                                              INNER JOIN [GroupsLists] ON Groups.GroupId = GroupsLists.GroupId">
+                       SelectCommand="SELECT DISTINCT Groups.GroupId, Groups.GroupName, Groups.GroupDescription, CategoryName FROM [Groups]
+                                              INNER JOIN [GroupsLists] ON Groups.GroupId = GroupsLists.GroupId
+                                              INNER JOIN [Categories] ON Groups.CategoryId = Categories.CategoryId">
     </asp:SqlDataSource>
 </asp:Content>
 

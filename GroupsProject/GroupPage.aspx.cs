@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Web.UI.WebControls;
 
 public partial class GroupPage : System.Web.UI.Page
 {
@@ -73,6 +74,7 @@ public partial class GroupPage : System.Web.UI.Page
                         //memberCB.Checked = 
                             isMem = bool.Parse(reader["IsMember"].ToString());
                     }
+                    reader.Close();
 
                     if (isMem){ hidIsMem.Value = "true"; }
                     // else { hidIsMem.Value = "false"; }
@@ -81,7 +83,7 @@ public partial class GroupPage : System.Web.UI.Page
                     if (mem) { hidMem.Value = "true"; }
                     
 
-                    loadPosts(con, gid);
+                    //LoadPosts(con, gid);
                     // apoi afisam postarile, fisierele, activitatile
                 }
                 catch (Exception exception)
@@ -104,14 +106,21 @@ public partial class GroupPage : System.Web.UI.Page
         }
     }
 
-    private void loadPosts(SqlConnection con, string gid)
+    /*private void LoadPosts(SqlConnection con, string gid)
     {
+       /* if(!User.Identity.IsAuthenticated) {return;}
+
+        SqlDataSource postSource = LV.FindControl("PostDS") as SqlDataSource;
+        postSource.SelectCommand = "SELECT PostDate;" +
+                                   " SELECT @@ROWCOUNT AS 'rc'";
+        SqlDataReader reader;
+        * /
         //try
         //{
         //    string query = "SELECT [PostId], [PostType], [PostDate] WHERE [GroupId] = @gid";
         //    SqlCommand cmd = new SqlCommand(query, con);
         //    cmd.Parameters.AddWithValue("gid", gid);
-            
+
         //    SqlDataReader reader = cmd.ExecuteReader();
         //}
         //catch (Exception e)
@@ -119,7 +128,7 @@ public partial class GroupPage : System.Web.UI.Page
         //    StatusMsg.Text += "\n" + e.Message;
         //    throw e;
         //}
-    }
+    }*/
 
     protected void LeaveButton_OnClick(object sender, EventArgs e)
     {
@@ -280,5 +289,16 @@ public partial class GroupPage : System.Web.UI.Page
             this.Page.ClientScript.RegisterStartupScript(this.GetType(), "alert", "alert('You clicked YES!')", true);
         }*/
         Response.Redirect("~/AdminPages/SendWarning.aspx?gid=" + Request.Params["gid"]);
+    }
+
+    protected void PostDS_OnSelecting(object sender, SqlDataSourceSelectingEventArgs e)
+    {
+        e.Command.Parameters["@gid"].Value = Server.UrlDecode(Request.Params["gid"]);
+    }
+
+
+    protected void NewPost_OnClick(object sender, EventArgs e)
+    {
+        Response.Redirect("~/UserPages/NewPost.aspx?gid=" + Request.Params["gid"]);
     }
 }

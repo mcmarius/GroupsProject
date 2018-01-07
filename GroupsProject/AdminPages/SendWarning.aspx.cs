@@ -7,6 +7,10 @@ namespace AdminPages
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if(!User.IsInRole("Admin"))
+            {
+                Response.Redirect("~/UserPages/Warnings.aspx");
+            }
             try
             {
                 int unused = int.Parse(Server.UrlDecode(Request.Params["gid"]) ?? throw new InvalidOperationException());

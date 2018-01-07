@@ -38,12 +38,71 @@
                 files --%>
             <br/>
             
-            <% if (bool.Parse(hidMem.Value) && !User.IsInRole("Admin"))
-               { %>
-                <asp:Button runat="server" ID="LeaveButton" Text="Leave group" OnClick="LeaveButton_OnClick"/>
+            <% if (bool.Parse(hidMem.Value))
+               {
+                   if (!User.IsInRole("Admin"))
+                   { %>
+                        <asp:Button runat="server" ID="LeaveButton" Text="Leave group" OnClick="LeaveButton_OnClick"/>
+                <% } %>
                 
-                <%-- display posts --%>
                 
+                <h3>Posts</h3>
+                
+                <asp:Repeater runat="server" ID="PostRepeater" DataSourceID="PostDS">
+                    <ItemTemplate>
+                        
+                        <%-- post date --%>
+                        <asp:Literal runat="server" ID="PostLit"
+                                     Text='<%# DataBinder.Eval(Container.DataItem, "PostDate") %>'></asp:Literal>
+                        <br/>
+
+                        <%-- post content --%>
+                        
+                        <asp:Literal runat="server" ID="MsgLit" Text='<%#DataBinder.Eval(Container.DataItem, "MessageTitle")%>'
+                                     Visible='<%#(DataBinder.Eval(Container.DataItem, "PostType").ToString() == "message") %>'></asp:Literal>
+                        
+                        <%-- else, if it's a poll --%>
+                        <asp:Literal runat="server" ID="PollLitM"
+                                     Text='<%#DataBinder.Eval(Container.DataItem, "PollQuestion")%>'
+                                     Visible='<%#(DataBinder.Eval(Container.DataItem, "PostType").ToString() == "poll")%>'>
+                        </asp:Literal>
+                        
+                        <%-- else, if it's a file --%>
+                        <asp:Literal runat="server" ID="Literal1"
+                                     Text='<%#DataBinder.Eval(Container.DataItem, "FileName")%>'
+                                     Visible='<%#(DataBinder.Eval(Container.DataItem, "PostType").ToString() == "file")%>'>
+                        </asp:Literal>
+                        <br/>
+                        <br/>
+                    </ItemTemplate>
+                </asp:Repeater>
+                
+                <asp:SqlDataSource runat="server" ID="PostDS" OnSelecting="PostDS_OnSelecting"
+                                   ConnectionString="<%$ConnectionStrings:ConnectionString %>"
+                                   SelectCommand="SELECT PostDate, PostType,
+                            MessageTitle, MessageContent,
+                            PollType, PollQuestion,
+                            FileName, FileContent
+                            FROM Posts
+                            FULL OUTER JOIN Polls ON Posts.PostId = Polls.PostId
+                            FULL OUTER JOIN Messages ON Posts.PostId = Messages.PostId
+                            FULL OUTER JOIN Files ON Posts.PostId = Files.PostId
+                            WHERE GroupId = @gid
+                            ORDER BY PostDate DESC;">
+                    <%-- SELECT PostDate, PostType,
+                            IsNull(MessageTitle, '') AS 'MessageTitle', IsNull(MessageContent, '') AS 'MessageContent',
+                            IsNull(PollType, '') AS 'PollType', IsNull(PollQuestion, '') AS 'PollQuestion',
+                            IsNull(FileName, ''), IsNull(FileContent, -1)
+                            FROM Posts
+                            FULL OUTER JOIN Polls ON Posts.PostId = Polls.PostId
+                            FULL OUTER JOIN Messages ON Posts.PostId = Messages.PostId
+                            FULL OUTER JOIN Files ON Posts.PostId = Files.PostId --%>
+                    <SelectParameters>
+                        <asp:Parameter Name="gid"/>
+                    </SelectParameters>
+                </asp:SqlDataSource>
+                
+                <asp:Button runat="server" ID="NewPost" Text="Create new post" OnClick="NewPost_OnClick"/>
                 
             <% }
                else if(!User.IsInRole("Admin"))

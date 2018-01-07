@@ -10,14 +10,17 @@
     <asp:Repeater runat="server" ID="MyRepeater" DataSourceID="SqlDataSource1">
         <ItemTemplate>
             <div style="padding: 10px">
-                <h3> <%# DataBinder.Eval(Container.DataItem, "Group Name") %> </h3>
+                <h3> <%# DataBinder.Eval(Container.DataItem, "GroupName") %> </h3>
 
                 <div>
-                    Description: <%# DataBinder.Eval(Container.DataItem, "Description") %>
+                    Description: <%# DataBinder.Eval(Container.DataItem, "GroupDescription") %>
+                </div>
+                <div>
+                    Category: <%# DataBinder.Eval(Container.DataItem, "CategoryName") %>
                 </div>
 
                 <asp:HyperLink runat="server" ID="HLGroup"
-                               NavigateUrl='<%# "~/GroupPage.aspx?gid=" + Server.UrlEncode(DataBinder.Eval(Container.DataItem, "GID").ToString()) %>'>Group page</asp:HyperLink>
+                               NavigateUrl='<%# "~/GroupPage.aspx?gid=" + Server.UrlEncode(DataBinder.Eval(Container.DataItem, "GroupId").ToString()) %>'>Group page</asp:HyperLink>
             </div>
         </ItemTemplate>
 

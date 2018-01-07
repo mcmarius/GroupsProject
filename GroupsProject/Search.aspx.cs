@@ -7,14 +7,23 @@ public partial class Search : System.Web.UI.Page
         if (!Page.IsPostBack && Request.Params["query"] != null)
         {
             string query = Server.UrlDecode(Request.Params["query"]);
-
-            SqlDataSource1.SelectCommand = "SELECT DISTINCT Groups.GroupId AS 'GID'," +
-                                           " Groups.GroupName AS 'Group Name'," +
-                                           " Groups.GroupDescription AS 'Description'" +
-                                           " FROM[Groups]" +
-                                           " INNER JOIN[GroupsLists]" +
-                                           " ON Groups.GroupId = GroupsLists.GroupId" +
-                                           " WHERE GroupName LIKE @query OR GroupDescription LIKE @query";
+            SqlDataSource1.SelectCommand = "SELECT DISTINCT Groups.GroupId, Groups.GroupName, Groups.GroupDescription, Groups.CategoryId, CategoryName"+
+            " FROM[Groups]" +
+            " INNER JOIN[GroupsLists] ON Groups.GroupId = GroupsLists.GroupId" +
+            " INNER JOIN[Categories] ON Groups.CategoryId = Categories.CategoryId" +
+            " WHERE"+
+            " GroupName LIKE @query OR GroupDescription LIKE @query OR" +
+            " CategoryName LIKE @query ";
+            //SqlDataSource1.SelectCommand = "SELECT DISTINCT Groups.GroupId," +
+            //                               " Groups.GroupName," +
+            //                               " Groups.GroupDescription " +
+            //                               " Groups.CategoryId " +
+            //                               " FROM [Groups] " +
+            //                               " INNER JOIN [GroupsLists] ON Groups.GroupId = GroupsLists.GroupId" +
+            //                               " INNER JOIN [Categories] ON Groups.CategoryId = Categories.CategoryId" +
+            //                               " WHERE GroupName LIKE @query OR" +
+            //                               " GroupDescription LIKE @query OR" +
+            //                               " CategoryName LIKE @query";
 
             SqlDataSource1.SelectParameters.Clear();
             SqlDataSource1.SelectParameters.Add("query", "%" + query + "%");

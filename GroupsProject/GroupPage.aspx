@@ -42,47 +42,115 @@
                {
                    if (!User.IsInRole("Admin"))
                    { %>
-                        <asp:Button runat="server" ID="LeaveButton" Text="Leave group" OnClick="LeaveButton_OnClick"/>
+                    <asp:Button runat="server" ID="LeaveButton" Text="Leave group" OnClick="LeaveButton_OnClick"/>
                 <% } %>
                 
-                
+            <% }%>
+            
+            <%
+               else if(!User.IsInRole("Admin"))
+               { %>
+                <asp:Button runat="server" ID="JoinButton" Text="Join group" OnClick="JoinButton_OnClick"/>
+            <% } %>
+            <%--<asp:CheckBox runat="server" ID="MemberCB" Enabled="False"/>
+            <asp:CheckBox runat="server" ID="ModCB" Enabled="False"/>--%>
+            <br/>
+            <% if(bool.Parse(hidIsMem.Value)){ %>
                 <h3>Posts</h3>
                 
                 <asp:Repeater runat="server" ID="PostRepeater" DataSourceID="PostDS">
                     <ItemTemplate>
                         
                         <%-- post date --%>
+                        Posted by 
+                        <asp:Literal runat="server" ID="PostAuthorLit"
+                                     Text='<%# DataBinder.Eval(Container.DataItem, "Author") %>'></asp:Literal>
+                        on
                         <asp:Literal runat="server" ID="PostLit"
                                      Text='<%# DataBinder.Eval(Container.DataItem, "PostDate") %>'></asp:Literal>
                         <br/>
 
                         <%-- post content --%>
-                        
-                        <asp:Literal runat="server" ID="MsgLit" Text='<%#DataBinder.Eval(Container.DataItem, "MessageTitle")%>'
-                                     Visible='<%#(DataBinder.Eval(Container.DataItem, "PostType").ToString() == "message") %>'></asp:Literal>
-                        
+                        <asp:Panel runat="server" ID="MessagePanel"
+                                   Visible='<%#DataBinder.Eval(Container.DataItem, "PostType").ToString() == "message" %>'>
+                            
+                            <div>
+                                Title:
+                                <asp:Literal runat="server" ID="MsgLit" Text='<%#DataBinder.Eval(Container.DataItem, "MessageTitle") %>'></asp:Literal>
+                            </div>
+                            <br/>
+                            <div>
+                                Content:
+                                <asp:Literal runat="server" ID="Literal2" Text='<%#DataBinder.Eval(Container.DataItem, "MessageContent") %>'></asp:Literal>
+                            </div>
+                        </asp:Panel>
                         <%-- else, if it's a poll --%>
-                        <asp:Literal runat="server" ID="PollLitM"
-                                     Text='<%#DataBinder.Eval(Container.DataItem, "PollQuestion")%>'
-                                     Visible='<%#(DataBinder.Eval(Container.DataItem, "PostType").ToString() == "poll")%>'>
-                        </asp:Literal>
-                        
-                        <%-- else, if it's a file --%>
-                        <asp:Literal runat="server" ID="Literal1"
-                                     Text='<%#DataBinder.Eval(Container.DataItem, "FileName")%>'
-                                     Visible='<%#(DataBinder.Eval(Container.DataItem, "PostType").ToString() == "file")%>'>
-                        </asp:Literal>
-                        <br/>
+                        <asp:Panel runat="server" ID="PollPanel"
+                                   Visible='<%#DataBinder.Eval(Container.DataItem, "PostType").ToString() == "poll"%>'>
+                            Question:
+                            <asp:Literal runat="server" ID="PollLitM"
+                                         Text='<%#DataBinder.Eval(Container.DataItem, "PollQuestion")%>'>
+                            </asp:Literal>
+                            <br/>
+                            Options:
+                            <asp:Panel runat="server" ID="CBList" Visible='<%#DataBinder.Eval(Container.DataItem, "PollType") is bool  ?
+                                                                                  !(bool) DataBinder.Eval(Container.DataItem, "PollType") : false%>'>
+                                <asp:CheckBoxList runat="server" ID="Mlist" DataSourceID="MChoice" OnUnload="Mlist_OnUnload"
+                                                  DataValueField="OptionId" DataTextField="Display"
+                                                   AutoPostBack="True" ToolTip="PollId"
+                                                  Enabled='<%#DataBinder.Eval(Container.DataItem, "Ans") is bool ? 
+                                                                  !(bool) DataBinder.Eval(Container.DataItem, "Ans")  : false %>'/>
+                                
+                                
+                                <asp:SqlDataSource runat="server" ID="MChoice" OnSelecting="MChoice_OnSelecting"
+                                                   ConnectionString="<%$ConnectionStrings:ConnectionString %>"
+                                                   SelectCommand="SELECT OptionId, OptionName, OptionCount, COALESCE (OptionName + ' (' + STR(OptionCount) + ' )' ,'') AS 'Display'
+                                    FROM Options WHERE PollId=@pollId">
+                                    <SelectParameters><asp:Parameter Name="pollId"/></SelectParameters>
+                                </asp:SqlDataSource>
+                                
+                                <asp:Button runat="server" ID="SubmitPollButton" Text="Answer question"
+                                            OnClick="SubmitPollButton_OnClick"
+                                            Enabled='<%#DataBinder.Eval(Container.DataItem, "Ans") is bool ? !(bool) DataBinder.Eval(Container.DataItem, "Ans")  : false %>'/>
+                            </asp:Panel>
+                            
+                            <asp:Panel runat="server" ID="RBList" Visible='<%#DataBinder.Eval(Container.DataItem, "PollType") is bool ? (bool) DataBinder.Eval(Container.DataItem, "PollType") : false %>'>
+                                
+                            </asp:Panel>
+                        </asp:Panel>
+                                                                              <%-- else, if it's a file --%>
+                        <asp:Panel runat="server" ID="FilePanel"
+                                   Visible='<%#DataBinder.Eval(Container.DataItem, "PostType").ToString() == "file" %>'>
+                            
+                            <asp:Literal runat="server" ID="Literal1"
+                                         Text='<%#DataBinder.Eval(Container.DataItem, "FileName")%>'>
+                            </asp:Literal>
+                        </asp:Panel>
                         <br/>
                     </ItemTemplate>
                 </asp:Repeater>
                 
                 <asp:SqlDataSource runat="server" ID="PostDS" OnSelecting="PostDS_OnSelecting"
                                    ConnectionString="<%$ConnectionStrings:ConnectionString %>"
-                                   SelectCommand="SELECT PostDate, PostType,
+                                   SelectCommand="SELECT PostDate, PostType, Posts.UserName AS 'Author',
                             MessageTitle, MessageContent,
-                            PollType, PollQuestion,
-                            FileName, FileContent
+                            PollType, PollQuestion, Polls.PollId, 
+							PollsAnswers.Answered AS 'Ans', PollsAnswers.UserName as 'UPoll',
+                            FileName, FileContent, FileId
+                            FROM Posts
+                            FULL OUTER JOIN Polls ON Posts.PostId = Polls.PostId
+                            FULL OUTER JOIN Messages ON Posts.PostId = Messages.PostId
+                            FULL OUTER JOIN Files ON Posts.PostId = Files.PostId
+							FULL OUTER JOIN PollsAnswers ON Polls.PollId = PollsAnswers.PollId
+                            WHERE GroupId = @gid
+                            AND PollsAnswers.UserName = @uname
+                            ORDER BY PostDate DESC;">
+                                   
+                                   
+                                   <%-- "SELECT PostDate, PostType, Posts.UserName AS 'Author',
+                            MessageTitle, MessageContent,
+                            PollType, PollQuestion, PollId, PollAnswered, Polls.UserNAme as 'UPoll',
+                            FileName, FileContent, FileId
                             FROM Posts
                             FULL OUTER JOIN Polls ON Posts.PostId = Polls.PostId
                             FULL OUTER JOIN Messages ON Posts.PostId = Messages.PostId
@@ -99,19 +167,13 @@
                             FULL OUTER JOIN Files ON Posts.PostId = Files.PostId --%>
                     <SelectParameters>
                         <asp:Parameter Name="gid"/>
+                        <asp:Parameter Name="uname"/>
                     </SelectParameters>
                 </asp:SqlDataSource>
                 
                 <asp:Button runat="server" ID="NewPost" Text="Create new post" OnClick="NewPost_OnClick"/>
                 
-            <% }
-               else if(!User.IsInRole("Admin"))
-               { %>
-                <asp:Button runat="server" ID="JoinButton" Text="Join group" OnClick="JoinButton_OnClick"/>
-            <% } %>
-            <%--<asp:CheckBox runat="server" ID="MemberCB" Enabled="False"/>
-            <asp:CheckBox runat="server" ID="ModCB" Enabled="False"/>--%>
-            <br/>
+            <% }%>
             <br/>
             
             <%-- navigation: join if pending or oth
@@ -123,6 +185,7 @@
             
         </LoggedInTemplate>
     </asp:LoginView>
+    <br/>
             <asp:HyperLink runat="server" ID="HLMembers">Members</asp:HyperLink>
             <%--<asp:Button runat="server" ID="MemButton" Text="Members" OnClick="MemButton_OnClick"/>--%>
     <asp:LoginView runat="server" ID="LV2">

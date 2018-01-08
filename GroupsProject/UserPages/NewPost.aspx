@@ -13,9 +13,9 @@
         <asp:DropDownList ID="PostTypeDDL" runat="server" AutoPostBack="True"
                           OnSelectedIndexChanged="PostTypeDDL_OnSelectedIndexChanged">
             <Items>
-                <asp:ListItem Value="Message"></asp:ListItem>
-                <asp:ListItem Value="Poll"></asp:ListItem>
-                <asp:ListItem Value="File"></asp:ListItem>
+                <asp:ListItem Value="message" Text="Write a message"></asp:ListItem>
+                <asp:ListItem Value="poll" Text="Ask a question"></asp:ListItem>
+                <asp:ListItem Value="file" Text="Upload a File"></asp:ListItem>
             </Items>
         </asp:DropDownList>
     </div>
@@ -56,17 +56,19 @@
                 <asp:Label ID="COptionLabel" runat="server" Text="Poll options"></asp:Label>
                 <asp:TextBox ID="COptionTB" runat="server"></asp:TextBox>
                 <asp:Button runat="server" ID="AddCBButton" Text="Add option" OnClick="AddCBButton_OnClick"/>
+                <asp:Button runat="server" ID="DelCBButton" Text="Remove selected options" OnClick="DelCBButton_OnClick"/>
             </div>
         </asp:Panel>
         
         <asp:Panel runat="server" ID="RPanel" Visible="False">
             <div>
-                <asp:RadioButtonList ID="PollRBList" runat="server">
+                <asp:CHeckboxList ID="PollRBList" runat="server">
             
-                </asp:RadioButtonList>
+                </asp:CHeckboxList>
                 <asp:Label ID="ROptionLabel" runat="server" Text="Poll options"></asp:Label>
                 <asp:TextBox ID="ROptionTB" runat="server"></asp:TextBox>
                 <asp:Button runat="server" ID="AddRBButton" Text="Add option" OnClick="AddRBButton_OnClick"/>
+                <asp:Button runat="server" ID="DelRBButton" Text="Remove selected options" OnClick="DelRBButton_OnClick"/>
             </div>
         </asp:Panel>
         <br/>
@@ -78,6 +80,6 @@
         </div>
         <br/>
     </asp:Panel>
-    <asp:Button runat="server" ID="PostButton" Text="Create post"/>
+    <asp:Button runat="server" ID="PostButton" Text="Create post" OnClick="PostButton_OnClick"/>
 </asp:Content>
 

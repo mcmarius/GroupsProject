@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Web.UI.WebControls;
 
 public partial class GroupPage : System.Web.UI.Page
@@ -23,10 +24,12 @@ public partial class GroupPage : System.Web.UI.Page
             bool isMod = false;
             bool isMem = false;
             bool mem = false;
-            
+
             try
             {
-                SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+                SqlConnection con =
+                    new SqlConnection(
+                        @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
                 con.Open();
 
                 try
@@ -56,32 +59,42 @@ public partial class GroupPage : System.Web.UI.Page
                         CategoryLiteral.Text = reader["CategoryName"].ToString();
                     }
                     reader.Close();
-                    
+
                     // acum vedem daca userul este membru al grupului
-                    string glist = "SELECT [IsModerator], [IsMember] FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
+                    string glist =
+                        "SELECT [IsModerator], [IsMember] FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
                     SqlCommand cmd3 = new SqlCommand(glist, con);
                     cmd3.Parameters.AddWithValue("uname", User.Identity.Name);
                     cmd3.Parameters.AddWithValue("gid", gid);
                     reader = cmd3.ExecuteReader();
-                    
+
                     while (reader.Read())
                     {
                         //var modCB = LV.FindControl("ModCB") as CheckBox;
                         //var memberCB = LV.FindControl("MemberCB") as CheckBox;
                         //modCB.Checked = 
                         mem = true;
-                            isMod = bool.Parse(reader["IsModerator"].ToString());
+                        isMod = bool.Parse(reader["IsModerator"].ToString());
                         //memberCB.Checked = 
-                            isMem = bool.Parse(reader["IsMember"].ToString());
+                        isMem = bool.Parse(reader["IsMember"].ToString());
                     }
                     reader.Close();
 
-                    if (isMem){ hidIsMem.Value = "true"; }
+                    if (isMem)
+                    {
+                        hidIsMem.Value = "true";
+                    }
                     // else { hidIsMem.Value = "false"; }
-                    if (isMod) { hidIsMod.Value = "true"; }
+                    if (isMod)
+                    {
+                        hidIsMod.Value = "true";
+                    }
                     // else { hidIsMod.Value = "false"; }
-                    if (mem) { hidMem.Value = "true"; }
-                    
+                    if (mem)
+                    {
+                        hidMem.Value = "true";
+                    }
+
 
                     //LoadPosts(con, gid);
                     // apoi afisam postarile, fisierele, activitatile
@@ -94,14 +107,14 @@ public partial class GroupPage : System.Web.UI.Page
                 {
                     con.Close();
                 }
-                
+
 
             }
             catch (Exception ex)
             {
                 StatusMsg.Text += "\n" + ex.Message;
             }
-            
+
             HLMembers.NavigateUrl = "~/GroupMembers.aspx?gid=" + Server.UrlEncode(gid2.ToString());
         }
     }
@@ -152,7 +165,7 @@ public partial class GroupPage : System.Web.UI.Page
                     count = int.Parse(reader["c"].ToString());
                 }
                 reader.Close();
-                
+
                 // now get user's rights
                 bool isMod = false;
                 string qUsr = "SELECT IsModerator FROM GroupsLists WHERE UserName = @uname AND GroupId = @gid";
@@ -206,13 +219,15 @@ public partial class GroupPage : System.Web.UI.Page
         try
         {
             string gid = Server.UrlDecode(Request.Params["gid"]);
-            SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
 
             try
             {
                 string query = "INSERT INTO GroupsLists (UserName, GroupId, IsModerator, IsMember)" +
-                    "VALUES (@uname, @gid, @ismod, @ismem)";
+                               "VALUES (@uname, @gid, @ismod, @ismem)";
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("uname", User.Identity.Name);
                 cmd.Parameters.AddWithValue("gId", gid);
@@ -238,9 +253,11 @@ public partial class GroupPage : System.Web.UI.Page
         try
         {
             string gid = Server.UrlDecode(Request.Params["gid"]);
-            SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
-            
+
             try
             {
                 string query = "DELETE FROM [Groups] WHERE GroupId = @gid";
@@ -294,11 +311,91 @@ public partial class GroupPage : System.Web.UI.Page
     protected void PostDS_OnSelecting(object sender, SqlDataSourceSelectingEventArgs e)
     {
         e.Command.Parameters["@gid"].Value = Server.UrlDecode(Request.Params["gid"]);
+        e.Command.Parameters["@uname"].Value = User.Identity.Name;
     }
 
 
     protected void NewPost_OnClick(object sender, EventArgs e)
     {
         Response.Redirect("~/UserPages/NewPost.aspx?gid=" + Request.Params["gid"]);
+    }
+
+    protected void MChoice_OnSelecting(object sender, SqlDataSourceSelectingEventArgs e)
+    {
+        e.Command.Parameters["@pollId"].Value = Eval("PollId");
+    }
+
+    protected void SubmitPollButton_OnClick(object sender, EventArgs e)
+    {
+        var button = sender as Button;
+        var CBList = button.Parent;
+        var checkBoxList = CBList.FindControl("MList") as CheckBoxList;
+        try
+        {
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            con.Open();
+
+            try
+            {
+                // find option in db
+                string findQuery = "SELECT PollId, OptionCount" +
+                                   " FROM Options WHERE OptionId = @oid";
+                int pollId=0;
+                string query = "UPDATE Options" +
+                               " SET OptionCount = @ocount" +
+                               " WHERE PollId=@pollId AND OptionId=@oid";
+                Debug.Assert(checkBoxList != null, nameof(checkBoxList) + " != null");
+                for (int i=0; i < checkBoxList.Items.Count; i++)
+                {
+                    int  optionCount=0;
+                    pollId = 0;
+                    SqlCommand rc = new SqlCommand(findQuery, con);
+                    rc.Parameters.AddWithValue("oid", checkBoxList.Items[i].Value);
+                    SqlDataReader reader = rc.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        pollId = int.Parse(reader["PollId"].ToString());
+                        optionCount = int.Parse(reader["OptionCount"].ToString());
+                    }
+                    reader.Close();
+                    
+                    
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("ocount", optionCount +
+                                                          (checkBoxList.Items[i].Selected ? 1 : 0));
+                    cmd.Parameters.AddWithValue("pollId", pollId);
+                    cmd.Parameters.AddWithValue("oid", checkBoxList.Items[i].Value);
+                    cmd.ExecuteNonQuery();
+                }
+                // add user name here...
+                string pQuery = "UPDATE PollsAnswers" +
+                                " SET Answered = 1" +
+                                " WHERE PollId = @pollId AND UserName = @uname";
+                SqlCommand pc = new SqlCommand(pQuery, con);
+                pc.Parameters.AddWithValue("pollId", pollId);
+                pc.Parameters.AddWithValue("uname", User.Identity.Name);
+                pc.ExecuteNonQuery();
+
+                //StatusMsg.Text = "You have applied for membership in this group!";
+                //Response.Redirect("~/UserPages/MyGroups.aspx");
+            }
+            catch (Exception ex)
+            {
+                StatusMsg.Text += "\n" + ex.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMsg.Text += "\n" + ex.Message;
+        }
+        Response.Redirect("GroupPage.aspx?gid="+Request.Params["gid"]);
+    }
+
+    protected void Mlist_OnUnload(object sender, EventArgs e)
+    {
+        //var checkBoxList = sender as CheckBoxList;
+        
     }
 }

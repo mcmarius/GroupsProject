@@ -320,7 +320,7 @@ public partial class GroupPage : System.Web.UI.Page
         Response.Redirect("~/UserPages/NewPost.aspx?gid=" + Request.Params["gid"]);
     }
 
-    protected void MChoice_OnSelecting(object sender, SqlDataSourceSelectingEventArgs e)
+    protected void Choice_OnSelecting(object sender, SqlDataSourceSelectingEventArgs e)
     {
         e.Command.Parameters["@pollId"].Value = Eval("PollId");
     }
@@ -369,7 +369,7 @@ public partial class GroupPage : System.Web.UI.Page
                     cmd.Parameters.AddWithValue("oid", checkBoxList.Items[i].Value);
                     cmd.ExecuteNonQuery();
                 }
-                // add user name here...
+                
                 string pQuery = "UPDATE PollsAnswers" +
                                 " SET Answered = 1" +
                                 " WHERE PollId = @pollId AND UserName = @uname";
@@ -377,9 +377,8 @@ public partial class GroupPage : System.Web.UI.Page
                 pc.Parameters.AddWithValue("pollId", pollId);
                 pc.Parameters.AddWithValue("uname", User.Identity.Name);
                 pc.ExecuteNonQuery();
-
-                //StatusMsg.Text = "You have applied for membership in this group!";
-                //Response.Redirect("~/UserPages/MyGroups.aspx");
+                
+                Response.Redirect("GroupPage.aspx?gid="+Request.Params["gid"]);
             }
             catch (Exception ex)
             {
@@ -390,12 +389,66 @@ public partial class GroupPage : System.Web.UI.Page
         {
             StatusMsg.Text += "\n" + ex.Message;
         }
-        Response.Redirect("GroupPage.aspx?gid="+Request.Params["gid"]);
     }
 
-    protected void Mlist_OnUnload(object sender, EventArgs e)
+    protected void SubmitPollRadioButton_OnClick(object sender, EventArgs e)
     {
-        //var checkBoxList = sender as CheckBoxList;
-        
+        var button = sender as Button;
+        var CBList = button.Parent;
+        var radioButtonList = CBList.FindControl("SList") as RadioButtonList;
+        try
+        {
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            con.Open();
+
+            try
+            {
+                // find option in db
+                string findQuery = "SELECT PollId, OptionCount" +
+                                   " FROM Options WHERE OptionId = @oid";
+                int pollId = 0;
+                string query = "UPDATE Options" +
+                               " SET OptionCount = @ocount" +
+                               " WHERE PollId=@pollId AND OptionId=@oid";
+                Debug.Assert(radioButtonList != null, nameof(radioButtonList) + " != null");
+                
+                int optionCount = 0;
+                pollId = 0;
+                SqlCommand rc = new SqlCommand(findQuery, con);
+                rc.Parameters.AddWithValue("oid", radioButtonList.SelectedValue);
+                SqlDataReader reader = rc.ExecuteReader();
+                while (reader.Read())
+                {
+                    pollId = int.Parse(reader["PollId"].ToString());
+                    optionCount = int.Parse(reader["OptionCount"].ToString());
+                }
+                reader.Close();
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("ocount", optionCount + 1);
+                cmd.Parameters.AddWithValue("pollId", pollId);
+                cmd.Parameters.AddWithValue("oid", radioButtonList.SelectedValue);
+                cmd.ExecuteNonQuery();
+                
+                string pQuery = "UPDATE PollsAnswers" +
+                                " SET Answered = 1" +
+                                " WHERE PollId = @pollId AND UserName = @uname";
+                SqlCommand pc = new SqlCommand(pQuery, con);
+                pc.Parameters.AddWithValue("pollId", pollId);
+                pc.Parameters.AddWithValue("uname", User.Identity.Name);
+                pc.ExecuteNonQuery();
+
+                Response.Redirect("GroupPage.aspx?gid=" + Request.Params["gid"]);
+            }
+            catch (Exception ex)
+            {
+                StatusMsg.Text += "\n" + ex.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMsg.Text += "\n" + ex.Message;
+        }
     }
 }

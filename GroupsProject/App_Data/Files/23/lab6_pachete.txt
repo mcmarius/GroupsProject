@@ -1,0 +1,218 @@
+[DBMS_OUTPUT]
+Sa se scrie un bloc anonim care retine în 3 variabile PL/SQL numele, salariul si departamentul angajatului având codul 145. 
+Sa se afiseze aceste informatii (implicit, se va introduce o linie în buffer-ul specific DBMS_OUTPUT). 
+Sa se regaseasca aceasta linie si starea corespunzatoare (0, daca exista linii în buffer si 1, altfel). 
+Sa se afiseze linia si starea.
+
+SET SERVEROUTPUT ON
+DECLARE
+linie varchar2(255);
+stare number;
+v_nume  employees.last_name%TYPE;
+v_sal employees.salary%TYPE;
+v_dept employees.department_id%TYPE;
+ 
+BEGIN
+SELECT last_name, salary, department_id
+INTO v_nume,v_sal,v_dept
+FROM employees
+WHERE employee_id=145;
+DBMS_OUTPUT.PUT_LINE(v_nume||' '||v_sal||' '||v_dept); 
+DBMS_OUTPUT.GET_LINE(linie,stare);                       
+DBMS_OUTPUT.NEW_LINE;                      
+DBMS_OUTPUT.PUT_LINE(linie||'    '||stare);  --stare 0 sau 1;
+END;
+/
+SET SERVEROUTPUT OFF
+
+[DBMS_JOB] -- http://psoug.org/reference/dbms_job.html
+a) Sa se utilizeze pachetul DBMS_JOB pentru a plasa pentru executie în coada de asteptare a job-urilor, 
+procedura verifica din pachetul verif_pkg. Prima executie va avea loc peste 5 minute.
+
+VARIABLE num_job NUMBER
+BEGIN
+  DBMS_JOB.SUBMIT(
+    job => :num_job, ---- returneaza numarul jobului, printr-o variabila de legatura
+    what => 'verif_pkg.verifica('SA_MAN', 20);' –codul care va fi executat ca job
+    next_date => SYSDATE+1/288, -- data primei executii
+    interval => 'TRUNC(SYSDATE+1)'); -- intervalul dintre executiile job-ului
+  COMMIT;
+END;
+/
+PRINT num_job
+
+b) Aflati informatii despre job-urile curente în vizualizarea USER_JOBS.
+	
+SELECT job, next_date,what
+FROM user_jobs;
+
+c) Identificati în coada de asteptare job-ul pe care l-ati lansat si executati-l.
+
+BEGIN
+ DBMS_JOB.RUN(job => x); --x este numarul identificat 
+END;
+/
+
+d) Stergeti job-ul din coada de asteptare.
+
+EXECUTE DBMS_JOB.REMOVE(job=>x); 
+SELECT job, next_date,what
+FROM user_jobs;
+ 
+[UTL_FILE]
+
+-- http://www.adp-gmbh.ch/ora/sql/create_directory.html
+-- create directory files as '/home/vsl/dir_oracle';
+
+
+Creati o procedura numita EMP_REPORT care genereaza un raport într-un fisier al sistemului de operare, 
+utilizând pachetul UTL_FILE. Raportul va contine lista angajatilor care au depasit media salariilor din departamentul lor. 
+Procedura va avea doi parametri: directorul de iesire si numele fisierului text în care va fi scris raportul. 
+Tratati exceptiile care pot aparea la utilizarea pachetului UTL_FILE. 
+
+CREATE OR REPLACE PROCEDURE emp_report (
+	p_dir IN VARCHAR2, p_filename IN VARCHAR2) IS
+	v_file UTL_FILE.FILE_TYPE;
+	CURSOR avg_csr IS
+		SELECT last_name, department_id, salary
+		FROM employees e
+		WHERE salary > (SELECT AVG(salary)
+				      FROM employees
+				      GROUP BY e.department_id)
+		ORDER BY department_id;
+BEGIN
+	v_file := UTL_FILE.FOPEN(p_dir, p_filename, 'w');
+	UTL_FILE.PUT_LINE(v_file, 'Angajati care castiga mai mult decat salariul mediu:');
+	UTL_FILE.PUT_LINE(v_file,'Raport generat la date de '|| SYSDATE);
+	UTL_FILE.NEW_LINE(v_file);
+	FOR emp IN avg_csr
+	LOOP
+UTL_FILE.PUT_LINE(v_file, RPAD(emp.last_name, 30) || ' ' ||
+LPAD(NVL(TO_CHAR(emp.department_id, '9999'), '-'), 5)|| ' ' ||
+LPAD(TO_CHAR(emp.salary, '$99,999.00'), 12));
+	END LOOP;
+	UTL_FILE.NEW_LINE(v_file);
+	UTL_FILE.PUT_LINE(v_file, '***Sfârsitul raportului ***');
+	UTL_FILE.FCLOSE(v_file);
+END emp_report;
+/
+
+begin
+emp_report('FILES','raport.txt');
+end;
+
+[SQL dinamic, DBMS_SQL]
+-- http://docs.oracle.com/cd/B28359_01/appdev.111/b28370/dynamic.htm
+-- http://docs.oracle.com/cd/B19306_01/appdev.102/b14258/d_sql.htm
+
+Sa se construiasca o procedura care foloseste SQL dinamic pentru a sterge liniile unui tabel specificat ca parametru. 
+Subprogramul furnizeaza ca rezultat numarul liniilor sterse (nr_lin).
+
+CREATE OR REPLACE PROCEDURE sterge_linii_v1
+  (num_tab IN VARCHAR2, nr_lin OUT NUMBER)
+AS
+  nume_cursor INTEGER;
+BEGIN
+  nume_cursor := DBMS_SQL.OPEN_CURSOR;
+  DBMS_SQL.PARSE (nume_cursor, 'DELETE FROM ' ||
+                  num_tab, DBMS_SQL.V7);
+  nr_lin := DBMS_SQL.EXECUTE (nume_cursor);
+  DBMS_SQL.CLOSE_CURSOR (nume_cursor);
+END;
+
+VARIABLE linii_sterse NUMBER
+EXECUTE sterge_linii_v1 ('tabel', :linii_sterse)
+PRINT linii_sterse
+
+Obs: Pentru a executa o instructiune SQL dinamic poate fi utilizata si comanda EXECUTE IMMEDIATE. 
+
+CREATE OR REPLACE PROCEDURE sterge_linii_v2
+  (num_tab IN VARCHAR2, nr_lin OUT NUMBER)
+IS
+BEGIN
+  EXECUTE IMMEDIATE 'DELETE FROM ' || num_tab;
+  nr_lin := SQL%ROWCOUNT;
+END;
+
+a) Creati un pachet numit TABLE_PKG care utilizeaza SQL nativ pentru crearea sau stergerea unui tabel 
+si pentru adaugarea, modificarea sau stergerea de linii din tabel.
+
+Specificatia pachetului va contine procedurile urmatoare:
+- PROCEDURE make (table_name VARCHAR2, col_specs VARCHAR2)
+- PROCEDURE add_row (table_name VARCHAR2, values VARCHAR2, cols VARCHAR2 := NULL)
+- PROCEDURE upd_row(table_name VARCHAR2, set_values VARCHAR2, conditions VARCHAR2 := NULL)
+- PROCEDURE del_row(table_name VARCHAR2, conditions VARCHAR2 := NULL)
+- PROCEDURE remove(table_name VARCHAR2)
+
+b) Executati procedura MAKE pentru a crea un tabel, astfel:
+make('contacte', 'cod NUMBER(4), nume VARCHAR2(35)');
+
+c) Listati structura tabelului contacte.
+
+d) Adaugati înregistrari prin intermediul procedurii ADD_ROW.
+Exemplu: add_row('contacte', '1, ''Geoff Gallus''',  'cod, nume');
+
+e) Afisati continutul tabelului contacte.
+
+f) Executati procedura DEL_ROW pentru stergerea contactului având codul 1.
+
+g) Executati procedura UPD_ROW.
+Exemplu: upd_row('contacte', 'nume = ''Nancy Greenberg''', 'cod=2');
+
+h) Afisati continutul tabelului, apoi stergeti tabelul prin intermediul procedurii remove.
+Corpul pachetului va fi:
+
+
+Create or replace package body table_pkg IS
+	Procedure execute (stmt VARCHAR2) IS
+	BEGIN
+		Dbms_output.put_line(stmt);
+		Execute immediate stmt;
+	END;
+
+	PROCEDURE make(table_name VARCHAR2, col_specs VARCHAR2) IS
+		Stmt VARCHAR2(200) := 'CREATE TABLE '||table_name||' ('||col_specs ||')';
+	BEGIN
+		EXECUTE(stmt);
+	END;
+
+	PROCEDURE add_row(table_name VARCHAR2, col_values VARCHAR2, 
+                                                   cols VARCHAR2 := null) IS
+		stmt VARCHAR2(200) := 'INSERT INTO '||table_name;
+	BEGIN
+		IF cols IS NOT NULL THEN
+			Stmt := stmt ||' (' ||cols||')';
+		END IF;
+		stmt := stmt || ' VALUES(' || col_values || ')';
+		execute(stmt);
+	END;
+
+	PROCEDURE upd_row(table_name VARCHAR2, set_values VARCHAR2, 
+                    conditions VARCHAR2 := NULL) IS
+		stmt VARCHAR2(200) := 'UPDATE '||table_name || ' SET ' ||set_values;
+	BEGIN
+		IF conditions IS NOT NULL THEN
+			stmt := stmt || ' WHERE ' || conditions ;
+		END IF;
+		execute(stmt);
+	END;
+	PROCEDURE del_row(table_name VARCHAR2, conditions VARCHAR2 := NULL) IS
+		stmt VARCHAR2(200) := 'DELETE FROM '||table_name;
+	BEGIN
+		IF conditions IS NOT NULL THEN
+			stmt := stmt || ' WHERE ' || conditions ;
+		END IF;
+		execute(stmt);
+	END;
+
+	PROCEDURE remove(table_name VARCHAR2) IS
+		csr_id INTEGER;
+		stmt VARCHAR2(100) := 'DROP TABLE '||table_name;
+	BEGIN
+		csr_id := DBMS_SQL.OPEN_CURSOR;
+		DBMS_OUTPUT.PUT_LINE(stmt);
+		DBMS_SQL.PARSE(csr_id, stmt, DBMS_SQL.NATIVE);
+		DBMS_SQL.CLOSE_CURSOR(csr_id);
+	END;
+END table_pkg;
+/

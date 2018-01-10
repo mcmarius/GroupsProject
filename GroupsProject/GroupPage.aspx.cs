@@ -328,8 +328,9 @@ public partial class GroupPage : System.Web.UI.Page
     protected void SubmitPollButton_OnClick(object sender, EventArgs e)
     {
         var button = sender as Button;
-        var CBList = button.Parent;
-        var checkBoxList = CBList.FindControl("MList") as CheckBoxList;
+        Debug.Assert(button != null, nameof(button) + " != null");
+        var cbList = button.Parent;
+        var checkBoxList = cbList.FindControl("MList") as CheckBoxList;
         try
         {
             SqlConnection con =
@@ -394,8 +395,9 @@ public partial class GroupPage : System.Web.UI.Page
     protected void SubmitPollRadioButton_OnClick(object sender, EventArgs e)
     {
         var button = sender as Button;
-        var CBList = button.Parent;
-        var radioButtonList = CBList.FindControl("SList") as RadioButtonList;
+        Debug.Assert(button != null, nameof(button) + " != null");
+        var rbList = button.Parent;
+        var radioButtonList = rbList.FindControl("SList") as RadioButtonList;
         try
         {
             SqlConnection con =
@@ -408,7 +410,7 @@ public partial class GroupPage : System.Web.UI.Page
                 // find option in db
                 string findQuery = "SELECT PollId, OptionCount" +
                                    " FROM Options WHERE OptionId = @oid";
-                int pollId = 0;
+                int pollId;
                 string query = "UPDATE Options" +
                                " SET OptionCount = @ocount" +
                                " WHERE PollId=@pollId AND OptionId=@oid";
@@ -449,6 +451,33 @@ public partial class GroupPage : System.Web.UI.Page
         catch (Exception ex)
         {
             StatusMsg.Text += "\n" + ex.Message;
+        }
+    }
+
+    protected void PostRepeater_OnItemCommand(object source, RepeaterCommandEventArgs e)
+    {
+        if (e.CommandName == "Download")
+        {
+            string fullName = e.CommandArgument.ToString();
+            Response.ContentType = "application/octet-stream";
+            Response.AddHeader("Content-Disposition", "attachment;filename=" + Eval("FileName"));
+            Response.TransmitFile(Server.MapPath(fullName));
+            Response.End();
+        }
+    }
+
+    protected void DownloadLB_OnCommand(object sender, CommandEventArgs e)
+    {
+        if (e.CommandName == "Download")
+        {
+            string fullName = e.CommandArgument.ToString();
+            Response.ContentType = "application/octet-stream";
+            var urlDecode = Server.UrlDecode(Request.Params["gid"]);
+            Debug.Assert(urlDecode != null, nameof(urlDecode) + " != null");
+            string s = fullName.Remove(0, 18 + urlDecode.Length);
+            Response.AddHeader("Content-Disposition", "attachment;filename=" + s);
+            Response.TransmitFile(Server.MapPath(fullName));
+            Response.End();
         }
     }
 }

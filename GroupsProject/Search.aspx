@@ -7,7 +7,7 @@
     <asp:TextBox ID="SearchTextBox" runat="server"></asp:TextBox>
     <asp:Button ID="SearchButton" runat="server" Text="Search" OnClick="SearchButton_OnClick"/>
     <br/>
-    <asp:CheckBox runat="server" ID="StrictCB" Text="Exact match"/>
+    <asp:CheckBox runat="server" ID="StrictCB" Text="Exact match (e.g. for emojis)"/>
     <br/>
     <asp:Repeater runat="server" ID="MyRepeater" DataSourceID="SqlDataSource1">
         <ItemTemplate>

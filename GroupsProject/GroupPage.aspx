@@ -84,6 +84,8 @@
             <br/>
             <br/>
             <asp:Repeater runat="server" ID="PostRepeater" DataSourceID="PostDS">
+                          <%--OnItemCommand="PostRepeater_OnItemCommand"--%>
+                          
                 <ItemTemplate>
                         
                     <%-- post date --%>
@@ -104,7 +106,6 @@
                             Title:
                             <asp:Literal runat="server" ID="MsgLit" Text='<%#DataBinder.Eval(Container.DataItem, "MessageTitle") %>'></asp:Literal>
                         </div>
-                        <br/>
                         <div>
                             Content:
                             <asp:Literal runat="server" ID="Literal2" Text='<%#DataBinder.Eval(Container.DataItem, "MessageContent") %>'></asp:Literal>
@@ -163,9 +164,20 @@
                     <asp:Panel runat="server" ID="FilePanel"
                                Visible='<%#DataBinder.Eval(Container.DataItem, "PostType").ToString() == "file" %>'>
                             
+                        File name: 
                         <asp:Literal runat="server" ID="Literal1"
                                      Text='<%#DataBinder.Eval(Container.DataItem, "FileName")%>'>
                         </asp:Literal>
+                        <br/>
+                        <asp:LinkButton runat="server" ID="DownloadLB" Text="Download"
+                                        CommandArgument='<%# Eval("FullName")%>'
+                                        OnCommand="DownloadLB_OnCommand"
+                                        CommandName="Download"></asp:LinkButton>
+                        
+                        <%--<asp:HyperLink ID="HyperLink1" runat="server"
+                                       Text='<%# Eval("FileName") %>'
+                                       NavigateUrl='<%#  Eval("FileName","FullName") %>'
+                                       Target="_blank" />--%>
                     </asp:Panel>
                     <hr/>
                 </ItemTemplate>
@@ -177,7 +189,7 @@
                             MessageTitle, MessageContent,
                             PollType, PollQuestion, Polls.PollId, 
 							PollsAnswers.Answered AS 'Ans', IsNull(PollsAnswers.UserName, @uname) as 'UPoll',
-                            FileName, FileContent, FileId
+                            FileName, FullName
                             FROM Posts
                             FULL OUTER JOIN Polls ON Posts.PostId = Polls.PostId
                             FULL OUTER JOIN Messages ON Posts.PostId = Messages.PostId

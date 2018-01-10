@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Web.Security;
 using System.Web.UI.WebControls;
 
 namespace UserPages
@@ -37,7 +36,8 @@ namespace UserPages
                     reader.Close();
 
                     if (!isMem) { Response.Redirect("~/Index.aspx"); }
-                
+
+                    GNameLink.NavigateUrl = "~/GroupPage.aspx?gid=" + Server.UrlEncode(gid);
                 }
                 catch (Exception exception)
                 {
@@ -236,16 +236,18 @@ namespace UserPages
                                 throw new Exception();
                             }
                             
-                            Stream fs = FileUpload.PostedFile.InputStream;
-                            BinaryReader br = new BinaryReader(fs);
-                            Byte[] bytes = br.ReadBytes((int)fs.Length);
+                            //Stream fs = FileUpload.PostedFile.InputStream;
+                            //BinaryReader br = new BinaryReader(fs);
+                            //Byte[] bytes = br.ReadBytes((int)fs.Length);
 
                             string fq = "INSERT INTO Files" +
-                                        " (FileName, FileContent, PostId, FileType)" +
-                                        " VALUES (@fname, @fcontent, @postId, @fType)";
+                                        "(FileName, FullName, PostId)" +
+                                        //" (FileName, FileContent, PostId, FileType)" +
+                            //" VALUES (@fname, @fcontent, @postId, @fType)";
+                                        " VALUES (@fname, @fullname, @postId)";
                             string fileName = Path.GetFileName(FileUpload.PostedFile.FileName);
-                            string ext = Path.GetExtension(fileName);
-                            string fType;
+                            //string ext = Path.GetExtension(fileName);
+                            /** string fType;
                             switch (ext)
                             {
                                 case ".doc":
@@ -278,13 +280,25 @@ namespace UserPages
                                 default:
                                     fType = ext;
                                     break;
+                            }*/
+                        
+                            DirectoryInfo d=new DirectoryInfo(Server.MapPath("~\\App_Data\\Files\\"));
+                            try
+                            {
+                                d = Directory.CreateDirectory(Server.MapPath("~\\App_Data\\Files\\") + gid);
                             }
-                            
+                            catch (Exception ex)
+                            {
+                                StatusMsg.Text += "\n" + ex.Message;
+                            }
+                        
+                            FileUpload.SaveAs(Server.MapPath("~\\App_Data\\Files\\")+d.Name + "\\" + fileName);
                             SqlCommand fc = new SqlCommand(fq, con);
                             fc.Parameters.AddWithValue("fname", fileName);
-                            fc.Parameters.AddWithValue("fcontent", bytes);
+                            fc.Parameters.AddWithValue("fullname", "~\\App_Data\\Files\\" + d.Name + "\\"+ fileName);
+                            //fc.Parameters.AddWithValue("fcontent", bytes);
                             fc.Parameters.AddWithValue("postId", postId);
-                            fc.Parameters.AddWithValue("fType", fType);
+                            //fc.Parameters.AddWithValue("fType", ext); // fType
                             fc.ExecuteNonQuery();
                             break;
                         //default:

@@ -42,14 +42,20 @@
                         <LayoutTemplate>
                             <asp:Label ID="UserLabel" runat="server" Text="User: "></asp:Label>
                             <asp:TextBox ID="UserName" runat="server"></asp:TextBox>
-                            <!-- todo add validations -->
+                            <br/>
+                            <asp:RequiredFieldValidator ID="ReqValidUsr" runat="server" Display="Dynamic"
+                                                        ErrorMessage="Please enter a user name"
+                                                        ControlToValidate="UserName" ValidationGroup="login"></asp:RequiredFieldValidator>
                             
-                            
+                            <br/>
                             <asp:Label ID="PasswordLabel" runat="server" Text="Password: "></asp:Label>
                             <asp:TextBox ID="Password" runat="server" TextMode="Password"></asp:TextBox>
-                            <!-- todo add validations -->
-                            
-                            <asp:Button ID="SigninButton" runat="server" CommandName="Login" Text="Sign in" />
+                            <br/>
+                            <asp:RequiredFieldValidator ID="ReqValidPwd" runat="server" Display="Dynamic"
+                                                        ErrorMessage="You can't log in without a password!"
+                                                        ControlToValidate="Password" ValidationGroup="login"></asp:RequiredFieldValidator>
+                            <br/>
+                            <asp:Button ID="SigninButton" runat="server" CommandName="Login" Text="Sign in" ValidationGroup="login" />
                         </LayoutTemplate>
                     </asp:Login>
                 </AnonymousTemplate>

@@ -98,6 +98,19 @@ public partial class GroupPage : System.Web.UI.Page
 
                     //LoadPosts(con, gid);
                     // apoi afisam postarile, fisierele, activitatile
+                    var calendar = LV.FindControl("GCalendar") as Calendar;
+                        Debug.Assert(calendar != null, nameof(calendar) + " != null");
+                    string aQuery = "SELECT ActivityDate" +
+                                    " FROM Activities" +
+                                    " WHERE GroupId = @gid";
+                    SqlCommand acmd = new SqlCommand(aQuery, con);
+                    acmd.Parameters.AddWithValue("gid", gid);
+                    reader = acmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        calendar.SelectedDates.Add(DateTime.Parse(reader["ActivityDate"].ToString()));
+                    }
+                    reader.Close();
                 }
                 catch (Exception exception)
                 {
@@ -332,7 +345,8 @@ public partial class GroupPage : System.Web.UI.Page
         var cbList = button.Parent;
         var checkBoxList = cbList.FindControl("MList") as CheckBoxList;
         int cnt = 0;
-            for (int i = 0; i < checkBoxList.Items.Count; i++)
+        Debug.Assert(checkBoxList != null, nameof(checkBoxList) + " != null");
+        for (int i = 0; i < checkBoxList.Items.Count; i++)
             {
                 cnt += checkBoxList.Items[i].Selected ? 1 : 0;
             }
@@ -343,20 +357,20 @@ public partial class GroupPage : System.Web.UI.Page
                 new SqlConnection(
                     @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
-            
+
             try
             {
                 // find option in db
                 string findQuery = "SELECT PollId, OptionCount" +
                                    " FROM Options WHERE OptionId = @oid";
-                int pollId=0;
+                int pollId = 0;
                 string query = "UPDATE Options" +
                                " SET OptionCount = @ocount" +
                                " WHERE PollId=@pollId AND OptionId=@oid";
                 Debug.Assert(checkBoxList != null, nameof(checkBoxList) + " != null");
-                for (int i=0; i < checkBoxList.Items.Count; i++)
+                for (int i = 0; i < checkBoxList.Items.Count; i++)
                 {
-                    int  optionCount=0;
+                    int optionCount = 0;
                     pollId = 0;
                     SqlCommand rc = new SqlCommand(findQuery, con);
                     rc.Parameters.AddWithValue("oid", checkBoxList.Items[i].Value);
@@ -367,8 +381,8 @@ public partial class GroupPage : System.Web.UI.Page
                         optionCount = int.Parse(reader["OptionCount"].ToString());
                     }
                     reader.Close();
-                    
-                    
+
+
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("ocount", optionCount +
                                                           (checkBoxList.Items[i].Selected ? 1 : 0));
@@ -376,7 +390,7 @@ public partial class GroupPage : System.Web.UI.Page
                     cmd.Parameters.AddWithValue("oid", checkBoxList.Items[i].Value);
                     cmd.ExecuteNonQuery();
                 }
-                
+
                 string pQuery = "UPDATE PollsAnswers" +
                                 " SET Answered = 1" +
                                 " WHERE PollId = @pollId AND UserName = @uname";
@@ -384,12 +398,16 @@ public partial class GroupPage : System.Web.UI.Page
                 pc.Parameters.AddWithValue("pollId", pollId);
                 pc.Parameters.AddWithValue("uname", User.Identity.Name);
                 pc.ExecuteNonQuery();
-                
-                Response.Redirect("GroupPage.aspx?gid="+Request.Params["gid"]);
+
+                Response.Redirect("GroupPage.aspx?gid=" + Request.Params["gid"]);
             }
             catch (Exception ex)
             {
                 StatusMsg.Text += "\n" + ex.Message;
+            }
+            finally
+            {
+                con.Close();
             }
         }
         catch (Exception ex)
@@ -405,6 +423,7 @@ public partial class GroupPage : System.Web.UI.Page
         var rbList = button.Parent;
         var radioButtonList = rbList.FindControl("SList") as RadioButtonList;
         int cnt = 0;
+        Debug.Assert(radioButtonList != null, nameof(radioButtonList) + " != null");
         for (int i = 0; i < radioButtonList.Items.Count; i++)
         {
             cnt += radioButtonList.Items[i].Selected ? 1 : 0;
@@ -427,7 +446,7 @@ public partial class GroupPage : System.Web.UI.Page
                                " SET OptionCount = @ocount" +
                                " WHERE PollId=@pollId AND OptionId=@oid";
                 Debug.Assert(radioButtonList != null, nameof(radioButtonList) + " != null");
-                
+
                 int optionCount = 0;
                 pollId = 0;
                 SqlCommand rc = new SqlCommand(findQuery, con);
@@ -444,7 +463,7 @@ public partial class GroupPage : System.Web.UI.Page
                 cmd.Parameters.AddWithValue("pollId", pollId);
                 cmd.Parameters.AddWithValue("oid", radioButtonList.SelectedValue);
                 cmd.ExecuteNonQuery();
-                
+
                 string pQuery = "UPDATE PollsAnswers" +
                                 " SET Answered = 1" +
                                 " WHERE PollId = @pollId AND UserName = @uname";
@@ -458,6 +477,10 @@ public partial class GroupPage : System.Web.UI.Page
             catch (Exception ex)
             {
                 StatusMsg.Text += "\n" + ex.Message;
+            }
+            finally
+            {
+                con.Close();
             }
         }
         catch (Exception ex)
@@ -491,5 +514,60 @@ public partial class GroupPage : System.Web.UI.Page
             Response.TransmitFile(Server.MapPath(fullName));
             Response.End();
         }
+    }
+
+    protected void AddActivityButton_OnClick(object sender, EventArgs e)
+    {
+        var calendar = LV.FindControl("GCalendar") as Calendar;
+        Debug.Assert(calendar != null, nameof(calendar) + " != null");
+        if (calendar.SelectedDate == DateTime.MinValue)
+        {
+            StatusMsg.Text = "No date added!";
+            return;
+        }
+        var name = LV.FindControl("ANameTB") as TextBox;
+        var desc = LV.FindControl("ADescTB") as TextBox;
+        //StatusMsg.Text=calendar.SelectedDate.ToString();
+        string gid = Server.UrlDecode(Request.Params["gid"]);
+        try
+        {
+            SqlConnection con =
+                new SqlConnection(
+                    @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
+            con.Open();
+
+            try
+            {
+                string cQuery = "INSERT INTO Activities" +
+                                " (ActivityName, ActivityDate, ActivityDescription, GroupId)" +
+                                " VALUES (@aname, @adate, @adesc, @gid)";
+                SqlCommand cmd = new SqlCommand(cQuery, con);
+                Debug.Assert(name != null, nameof(name) + " != null");
+                cmd.Parameters.AddWithValue("aname", name.Text);
+                cmd.Parameters.AddWithValue("adate", calendar.SelectedDate);
+                Debug.Assert(desc != null, nameof(desc) + " != null");
+                cmd.Parameters.AddWithValue("adesc", desc.Text);
+                cmd.Parameters.AddWithValue("gid", gid);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception exception)
+            {
+                StatusMsg.Text = exception.Message;
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+        catch (Exception exception)
+        {
+            StatusMsg.Text = exception.Message;
+        }
+        Response.Redirect("GroupPage.aspx?gid=" + Server.UrlEncode(gid));
+    }
+
+    protected void ActivitiesDS_OnSelecting(object sender, SqlDataSourceSelectingEventArgs e)
+    {
+        e.Command.Parameters["@gid"].Value = Server.UrlDecode(Request.Params["gid"]);
     }
 }

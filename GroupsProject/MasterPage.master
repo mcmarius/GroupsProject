@@ -7,77 +7,78 @@
     <title></title>
     <asp:ContentPlaceHolder id="head" runat="server">
     </asp:ContentPlaceHolder>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 </head>
-<body>
-    <form id="form1" runat="server">
-        <div>
-            <h1>Groups!</h1>
-            
-                        
-            
-            <asp:HyperLink ID="HyperLink1" NavigateUrl="~/Index.aspx" runat="server">Home</asp:HyperLink>
-            
-            <asp:HyperLink ID="HyperLink2" NavigateUrl="~/Search.aspx" runat="server">Search</asp:HyperLink>
-            
-            <asp:LoginView ID="LoginView1" runat="server">
-                <AnonymousTemplate>
-                    <asp:HyperLink ID="HyperLink3" NavigateUrl="~/Signup.aspx" runat="server">Sign up</asp:HyperLink>
-                    <%--<asp:HyperLink ID="HyperLink4" NavigateUrl="~/Signin.aspx" runat="server">Sign in</asp:HyperLink>--%>
-                    <br/>
-                    <br/>
-                    <%--You are not logged in!--%>
-                </AnonymousTemplate>
-                <LoggedInTemplate>
-                    <asp:HyperLink runat="server" NavigateUrl="UserPages/MyGroups.aspx">My groups</asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="UserPages/CreateGroup.aspx">Create group</asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="UserPages/Warnings.aspx">Warnings</asp:HyperLink>
-                </LoggedInTemplate>
-            </asp:LoginView>
-        </div>
-        
-        <div style="float: right">
-            <asp:LoginView ID="LoginView2" runat="server">
-                <AnonymousTemplate>
-                    <asp:Login ID="Login1" runat="server">
-                        <LayoutTemplate>
-                            <asp:Label ID="UserLabel" runat="server" Text="User: "></asp:Label>
-                            <asp:TextBox ID="UserName" runat="server"></asp:TextBox>
-                            <br/>
-                            <asp:RequiredFieldValidator ID="ReqValidUsr" runat="server" Display="Dynamic"
-                                                        ErrorMessage="Please enter a user name"
-                                                        ControlToValidate="UserName" ValidationGroup="login"></asp:RequiredFieldValidator>
-                            
-                            <br/>
-                            <asp:Label ID="PasswordLabel" runat="server" Text="Password: "></asp:Label>
-                            <asp:TextBox ID="Password" runat="server" TextMode="Password"></asp:TextBox>
-                            <br/>
-                            <asp:RequiredFieldValidator ID="ReqValidPwd" runat="server" Display="Dynamic"
-                                                        ErrorMessage="You can't log in without a password!"
-                                                        ControlToValidate="Password" ValidationGroup="login"></asp:RequiredFieldValidator>
-                            <br/>
-                            <asp:Button ID="SigninButton" runat="server" CommandName="Login" Text="Sign in" ValidationGroup="login" />
-                        </LayoutTemplate>
-                    </asp:Login>
-                </AnonymousTemplate>
-                <LoggedInTemplate>
-                    Hi, <asp:LoginName ID="LoginName1" runat="server" />
-                    <br/>
-                    <asp:LoginStatus ID="LoginStatus1" runat="server" />
-                </LoggedInTemplate>
-                <%--<RoleGroups>
+<body style="background-color: cornsilk">
+<form id="form1" runat="server">
+    <div>
+        <h1>Groups!</h1>
+
+
+
+        <asp:HyperLink ID="HyperLink1" NavigateUrl="~/Index.aspx" runat="server">Home</asp:HyperLink>
+
+        <asp:HyperLink ID="HyperLink2" NavigateUrl="~/Search.aspx" runat="server">Search</asp:HyperLink>
+
+        <asp:LoginView ID="LoginView1" runat="server">
+            <AnonymousTemplate>
+                <asp:HyperLink ID="HyperLink3" NavigateUrl="~/Signup.aspx" runat="server">Sign up</asp:HyperLink>
+                <%--<asp:HyperLink ID="HyperLink4" NavigateUrl="~/Signin.aspx" runat="server">Sign in</asp:HyperLink>--%>
+                <br/>
+                <br/>
+                <%--You are not logged in!--%>
+            </AnonymousTemplate>
+            <LoggedInTemplate>
+                <asp:HyperLink runat="server" NavigateUrl="UserPages/MyGroups.aspx">My groups</asp:HyperLink>
+                <asp:HyperLink runat="server" NavigateUrl="UserPages/CreateGroup.aspx">Create group</asp:HyperLink>
+                <asp:HyperLink runat="server" NavigateUrl="UserPages/Warnings.aspx">Warnings</asp:HyperLink>
+            </LoggedInTemplate>
+        </asp:LoginView>
+    </div>
+
+    <div style="float: right">
+        <asp:LoginView ID="LoginView2" runat="server">
+            <AnonymousTemplate>
+                <asp:Login ID="Login1" runat="server">
+                    <LayoutTemplate>
+                        <asp:Label ID="UserLabel" runat="server" Text="User: "></asp:Label>
+                        <asp:TextBox ID="UserName" runat="server"></asp:TextBox>
+                        <br/>
+                        <asp:RequiredFieldValidator ID="ReqValidUsr" runat="server" Display="Dynamic"
+                                                    ErrorMessage="Please enter a user name"
+                                                    ControlToValidate="UserName" ValidationGroup="login"></asp:RequiredFieldValidator>
+
+                        <br/>
+                        <asp:Label ID="PasswordLabel" runat="server" Text="Password: "></asp:Label>
+                        <asp:TextBox ID="Password" runat="server" TextMode="Password"></asp:TextBox>
+                        <br/>
+                        <asp:RequiredFieldValidator ID="ReqValidPwd" runat="server" Display="Dynamic"
+                                                    ErrorMessage="You can't log in without a password!"
+                                                    ControlToValidate="Password" ValidationGroup="login"></asp:RequiredFieldValidator>
+                        <br/>
+                        <asp:Button ID="SigninButton" runat="server" CommandName="Login" Text="Sign in" ValidationGroup="login"/>
+                    </LayoutTemplate>
+                </asp:Login>
+            </AnonymousTemplate>
+            <LoggedInTemplate>
+                Hi, <asp:LoginName ID="LoginName1" runat="server"/>
+                <br/>
+                <asp:LoginStatus ID="LoginStatus1" runat="server"/>
+            </LoggedInTemplate>
+            <%--<RoleGroups>
                     <asp:RoleGroup runat="server" Roles="User">
                         <ContentTemplate></ContentTemplate>
                     </asp:RoleGroup>
                 </RoleGroups>--%>
 
-            </asp:LoginView>
-        </div>
-        
-        <div>
-            <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+        </asp:LoginView>
+    </div>
 
-            </asp:ContentPlaceHolder>
-        </div>
+    <div>
+        <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+
+        </asp:ContentPlaceHolder>
+    </div>
 </form>
 </body>
 </html>

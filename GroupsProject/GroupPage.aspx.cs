@@ -331,13 +331,19 @@ public partial class GroupPage : System.Web.UI.Page
         Debug.Assert(button != null, nameof(button) + " != null");
         var cbList = button.Parent;
         var checkBoxList = cbList.FindControl("MList") as CheckBoxList;
+        int cnt = 0;
+            for (int i = 0; i < checkBoxList.Items.Count; i++)
+            {
+                cnt += checkBoxList.Items[i].Selected ? 1 : 0;
+            }
+            if(cnt==0) return;
         try
         {
             SqlConnection con =
                 new SqlConnection(
                     @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
             con.Open();
-
+            
             try
             {
                 // find option in db
@@ -398,6 +404,12 @@ public partial class GroupPage : System.Web.UI.Page
         Debug.Assert(button != null, nameof(button) + " != null");
         var rbList = button.Parent;
         var radioButtonList = rbList.FindControl("SList") as RadioButtonList;
+        int cnt = 0;
+        for (int i = 0; i < radioButtonList.Items.Count; i++)
+        {
+            cnt += radioButtonList.Items[i].Selected ? 1 : 0;
+        }
+        if (cnt == 0) return;
         try
         {
             SqlConnection con =

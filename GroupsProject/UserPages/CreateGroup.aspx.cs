@@ -23,18 +23,22 @@ namespace UserPages
                 var l = LoginView1.FindControl("NewCategoryLabel") as Label;
                 var nc = LoginView1.FindControl("NewCategory") as TextBox;
                 var cl = LoginView1.FindControl("CategoryList") as DropDownList;
+                var reqnc = LoginView1.FindControl("ReqValNewCat") as RequiredFieldValidator;
                 Debug.Assert(ddl != null, nameof(ddl) + " != null");
                 Debug.Assert(l != null, nameof(l) + " != null");
                 Debug.Assert(nc != null, nameof(nc) + " != null");
                 Debug.Assert(cl != null, nameof(cl) + " != null");
+                    Debug.Assert(reqnc != null, nameof(reqnc) + " != null");
                 if (ddl.SelectedValue == "1") {
                     l.Visible = false;
                     nc.Visible = false;
+                    reqnc.Enabled = false;
                     cl.Visible = true;
                 } else
                 {
                     l.Visible = true;
                     nc.Visible = true;
+                    reqnc.Enabled = true;
                     cl.Visible = false;
                 }
             }

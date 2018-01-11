@@ -65,16 +65,22 @@ namespace UserPages
                 {
                     MessagePanel.Visible = true;
                     PollPanel.Visible = FilePanel.Visible = false;
+                    ReqValTitle.Enabled = ReqValContent.Enabled = true;
+                    ReqValPollQ.Enabled = ReqCustomVal.Enabled = ReqValFile.Enabled = false;
                 }
                 else if (PostTypeDDL.SelectedValue == "poll")
                 {
                     MessagePanel.Visible = FilePanel.Visible = false;
                     PollPanel.Visible = true;
+                    ReqValTitle.Enabled = ReqValContent.Enabled = ReqValFile.Enabled = false;
+                    ReqValPollQ.Enabled = ReqCustomVal.Enabled = true;
                 }
                 else
                 {
                     MessagePanel.Visible = PollPanel.Visible = false;
                     FilePanel.Visible = true;
+                    ReqValTitle.Enabled = ReqValContent.Enabled = ReqValPollQ.Enabled = ReqCustomVal.Enabled = false;
+                    ReqValFile.Enabled = true;
                 }
             }
         }
@@ -119,6 +125,8 @@ namespace UserPages
 
         protected void PostButton_OnClick(object sender, EventArgs e)
         {
+            if(!Page.IsValid)
+                return;
             try
             {
                 SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|Groups.mdf;Integrated Security=True;User Instance=False");
@@ -354,6 +362,27 @@ namespace UserPages
             for (int i = 0; i < list.Count; i++)
             {
                 PollRBList.Items.Remove(list[i]);
+            }
+        }
+
+        protected void CustomVal_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            try
+            {
+                var pollType = bool.Parse(PollTypeDDL.SelectedValue);
+                if (pollType)   // single choice
+                {
+                    args.IsValid = PollRBList.Items.Count > 1;
+                }
+                else
+                {
+                    args.IsValid = PollCBList.Items.Count > 1;
+                }
+            }
+            catch (Exception e)
+            {
+                StatusMsg.Text = e.Message;
+                args.IsValid = false;
             }
         }
     }

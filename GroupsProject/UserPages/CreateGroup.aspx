@@ -18,7 +18,9 @@
             <asp:Label runat="server" ID="GroupNameLabel" Text="Group name"></asp:Label>
             <br/>
             <asp:TextBox runat="server" ID="GroupName"></asp:TextBox>
-            
+            <asp:RequiredFieldValidator ID="ReqValGName" runat="server" Display="Dynamic"
+                                        ErrorMessage="Please enter the name of the new group!"
+                                        ValidationGroup="gcreate" ControlToValidate="GroupName"></asp:RequiredFieldValidator>
             <br/>
             <br/>
             
@@ -36,13 +38,21 @@
             <asp:Label runat="server" ID="NewCategoryLabel" Text="New category name" Visible="False"></asp:Label>
             <br/>
             <asp:TextBox runat="server" ID="NewCategory" Visible="False"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="ReqValNewCat" runat="server" Display="Dynamic" Enabled="False"
+                                        ErrorMessage="New category name cannot be empty!"
+                                        ControlToValidate="NewCategory" ValidationGroup="gcreate"></asp:RequiredFieldValidator>
             <br/>
             
             <asp:Label runat="server" ID="GroupDescriptionLabel" Text="Group description"></asp:Label>
             <br/>
             <asp:TextBox runat="server" ID="GroupDescription"></asp:TextBox>
+            <br/>
+            <asp:RequiredFieldValidator ID="ReqValDesc" runat="server" Display="Dynamic"
+                                        ErrorMessage="Please tell users what this group ia about!"
+                                        ControlToValidate="GroupDescription" ValidationGroup="gcreate"></asp:RequiredFieldValidator>
+            <br/>
             
-            <asp:Button ID="CreateButton" runat="server" Text="Create!" CausesValidation="True" ValidateRequestMode="Enabled" OnClick="CreateButton_OnClick"/>
+            <asp:Button ID="CreateButton" runat="server" Text="Create!" CausesValidation="True" ValidateRequestMode="Enabled" OnClick="CreateButton_OnClick" ValidationGroup="gcreate"/>
         </LoggedInTemplate>
     </asp:LoginView>
 </asp:Content>

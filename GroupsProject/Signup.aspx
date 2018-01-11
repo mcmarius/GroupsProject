@@ -17,7 +17,7 @@
 
     <br/>
     <h1>Sign up</h1>
-    <asp:CreateUserWizard ID="CreateUserWizard1" runat="server">
+    <asp:CreateUserWizard ID="CreateUserWizard1" runat="server" OnCreatedUser="CreateUserWizard1_OnCreatedUser">
         <CreateUserButtonStyle CssClass="cls"></CreateUserButtonStyle>
         <WizardSteps>
             <asp:CreateUserWizardStep ID="CreateUserWizardStep1" runat="server">

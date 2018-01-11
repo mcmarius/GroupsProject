@@ -78,6 +78,52 @@
             <asp:CheckBox runat="server" ID="ModCB" Enabled="False"/>--%>
         <br/>
         <% if(bool.Parse(hidIsMem.Value)){ %>
+            
+            
+            <%-- group activities --%>
+        <br/>
+        
+        <h3>Activities</h3>
+        
+        <asp:Calendar runat="server" ID="GCalendar"></asp:Calendar>
+        
+        <br/>
+        
+        <asp:GridView runat="server" DataSourceID="ActivitiesDS" AutoGenerateColumns="True"></asp:GridView>
+        
+        <asp:SqlDataSource runat="server" ID="ActivitiesDS" OnSelecting="ActivitiesDS_OnSelecting"
+                           ConnectionString="<%$ConnectionStrings:ConnectionString %>"
+                           SelectCommand="SELECT ActivityName AS 'Name',
+            ActivityDate AS 'Date', ActivityDescription AS 'Description'
+            FROM Activities
+            WHERE GroupId=@gid">
+            <SelectParameters>
+                <asp:Parameter Name="gid"/>
+            </SelectParameters>
+        </asp:SqlDataSource>
+        
+        <br/>
+        <h3>New activity</h3>
+        <div>
+            <asp:Label runat="server" ID="ANameL" Text="Activity name: "></asp:Label>
+            <asp:TextBox runat="server" ID="ANameTB"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="ReqValAName" runat="server" Display="Dynamic"
+                                        ErrorMessage="Please enter a name for this activity!"
+                                        ControlToValidate="ANameTB" ValidationGroup="acreate"></asp:RequiredFieldValidator>
+        </div>
+            
+        <br/>
+        <div>
+        <asp:Label runat="server" ID="ADescL" Text="Activity description: "></asp:Label>
+            <asp:TextBox runat="server" ID="ADescTB"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="ReqValDesc" runat="server" Display="Dynamic"
+                                        ErrorMessage="Please enter a description for this activity!"
+                                        ControlToValidate="ADescTB" ValidationGroup="acreate"></asp:RequiredFieldValidator>
+            </div>
+            <br/>
+        <asp:Button runat="server" ID="AddActivityButton" Text="Add new activity"
+                    OnClick="AddActivityButton_OnClick" CausesValidation="False" ValidationGroup="acreate"/>
+            
             <h3>Posts</h3>
                 
             <asp:Button runat="server" ID="NewPost" Text="Create new post" OnClick="NewPost_OnClick"/>
@@ -223,7 +269,7 @@
                     <asp:Parameter Name="uname"/>
                 </SelectParameters>
             </asp:SqlDataSource>
-                
+            
         <% }%>
         <br/>
             
